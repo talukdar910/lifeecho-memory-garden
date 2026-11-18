@@ -10,33 +10,146 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as MemorialMemorialIdRouteImport } from './routes/memorial.$memorialId'
+import { Route as AuthenticatedArchiveIndexRouteImport } from './routes/_authenticated/archive/index'
+import { Route as AuthenticatedArchiveMemorialIdRouteImport } from './routes/_authenticated/archive/$memorialId'
+import { Route as AuthenticatedArchiveNewRouteImport } from './routes/_authenticated/archive/new'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const MemorialMemorialIdRoute = MemorialMemorialIdRouteImport.update({
+  id: '/memorial/$memorialId',
+  path: '/memorial/$memorialId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedArchiveIndexRoute =
+  AuthenticatedArchiveIndexRouteImport.update({
+    id: '/archive/',
+    path: '/archive/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedArchiveMemorialIdRoute =
+  AuthenticatedArchiveMemorialIdRouteImport.update({
+    id: '/archive/$memorialId',
+    path: '/archive/$memorialId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedArchiveNewRoute = AuthenticatedArchiveNewRouteImport.update({
+  id: '/archive/new',
+  path: '/archive/new',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/profile': typeof AuthenticatedProfileRoute
+  '/memorial/$memorialId': typeof MemorialMemorialIdRoute
+  '/archive/$memorialId': typeof AuthenticatedArchiveMemorialIdRoute
+  '/archive/new': typeof AuthenticatedArchiveNewRoute
+  '/archive/': typeof AuthenticatedArchiveIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/profile': typeof AuthenticatedProfileRoute
+  '/memorial/$memorialId': typeof MemorialMemorialIdRoute
+  '/archive/$memorialId': typeof AuthenticatedArchiveMemorialIdRoute
+  '/archive/new': typeof AuthenticatedArchiveNewRoute
+  '/archive': typeof AuthenticatedArchiveIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/memorial/$memorialId': typeof MemorialMemorialIdRoute
+  '/_authenticated/archive/$memorialId': typeof AuthenticatedArchiveMemorialIdRoute
+  '/_authenticated/archive/new': typeof AuthenticatedArchiveNewRoute
+  '/_authenticated/archive/': typeof AuthenticatedArchiveIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/reset-password'
+    | '/dashboard'
+    | '/profile'
+    | '/memorial/$memorialId'
+    | '/archive/$memorialId'
+    | '/archive/new'
+    | '/archive/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/reset-password'
+    | '/dashboard'
+    | '/profile'
+    | '/memorial/$memorialId'
+    | '/archive/$memorialId'
+    | '/archive/new'
+    | '/archive'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/reset-password'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/profile'
+    | '/memorial/$memorialId'
+    | '/_authenticated/archive/$memorialId'
+    | '/_authenticated/archive/new'
+    | '/_authenticated/archive/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
+  MemorialMemorialIdRoute: typeof MemorialMemorialIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +161,97 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/memorial/$memorialId': {
+      id: '/memorial/$memorialId'
+      path: '/memorial/$memorialId'
+      fullPath: '/memorial/$memorialId'
+      preLoaderRoute: typeof MemorialMemorialIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/archive/': {
+      id: '/_authenticated/archive/'
+      path: '/archive'
+      fullPath: '/archive/'
+      preLoaderRoute: typeof AuthenticatedArchiveIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/archive/$memorialId': {
+      id: '/_authenticated/archive/$memorialId'
+      path: '/archive/$memorialId'
+      fullPath: '/archive/$memorialId'
+      preLoaderRoute: typeof AuthenticatedArchiveMemorialIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/archive/new': {
+      id: '/_authenticated/archive/new'
+      path: '/archive/new'
+      fullPath: '/archive/new'
+      preLoaderRoute: typeof AuthenticatedArchiveNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedArchiveMemorialIdRoute: typeof AuthenticatedArchiveMemorialIdRoute
+  AuthenticatedArchiveNewRoute: typeof AuthenticatedArchiveNewRoute
+  AuthenticatedArchiveIndexRoute: typeof AuthenticatedArchiveIndexRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedArchiveMemorialIdRoute: AuthenticatedArchiveMemorialIdRoute,
+  AuthenticatedArchiveNewRoute: AuthenticatedArchiveNewRoute,
+  AuthenticatedArchiveIndexRoute: AuthenticatedArchiveIndexRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
+  MemorialMemorialIdRoute: MemorialMemorialIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -28,3 +28,10 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Project rules
+- Archive business rules (visibility default, upload limits, accepted media) live in `src/lib/memory-rules.ts` with tests in `src/test/memory-rules.test.ts`; why: one testable source for rules the owner cares about.
+- Member data is read/written from the browser client under RLS inside `_authenticated` (client-only) routes; why: session lives in browser storage and RLS scopes every row to its owner.
+- Media lives in the private `memories` bucket at `{owner_id}/{memorial_id|avatar}/{file}` and is shown only via short-lived signed URLs (`useMediaUrls`); why: storage policies key off those folder segments.
+- Public memorial pages load through `getPublicMemorial` (publishable server client) and only return rows with visibility `public`; why: SSR head tags for shared links without exposing private data.
+- A single auth listener lives in `AuthProvider` (`src/lib/auth-context.tsx`); why: avoids competing subscribers.
