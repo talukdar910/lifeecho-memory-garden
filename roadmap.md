@@ -1,6 +1,12 @@
 # LifeEcho roadmap
-- [x] Design system (green/teal/black/white) + landing page
-- [x] Registration / sign-in (email, Google, Lovable) + password reset
-- [x] Member profile with active status (Active badge, member since, last active)
-- [x] Memory Archive: memorials, stories, photos, videos, audio (private by default, owner can make public)
-- [x] Public memorial page
+- [ ] New slogan + Tree of life logo + favicon
+- [ ] Registration: full name, email, password, date of birth, country; profile picture required at first sign-in
+- [ ] Active profile: green = alive & active, black = deceased/archived
+- [ ] Personal memory storage (story, experience, thought, photo, video, audio) with per-memory privacy + emotion
+- [ ] LIFEECHO MEMORY ARCHIVE: numbered profiles (Profile 001), "Visit Previous Profile"
+- [ ] Death verification with proof + admin approval
+- [ ] Admin dashboard: users, verifications, archive, reported content, security log
+- [ ] Admin = mustofaaazeenfr@gmail.com
+- [ ] Demo profiles (fictional)
+- [ ] AI translation of memories into the reader's language
+- [ ] Later: full interface translation, mobile apps, AI-assisted search

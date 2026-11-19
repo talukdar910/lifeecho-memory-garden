@@ -14,6 +14,233 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_invites: {
+        Row: {
+          created_at: string
+          email: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+        }
+        Relationships: []
+      }
+      archive_entries: {
+        Row: {
+          archived_at: string
+          avatar_path: string | null
+          biography: string | null
+          country: string | null
+          date_of_birth: string | null
+          date_of_death: string | null
+          death_report_id: string | null
+          full_name: string
+          id: string
+          is_demo: boolean
+          person_id: string
+          profile_number: number
+          published: boolean
+        }
+        Insert: {
+          archived_at?: string
+          avatar_path?: string | null
+          biography?: string | null
+          country?: string | null
+          date_of_birth?: string | null
+          date_of_death?: string | null
+          death_report_id?: string | null
+          full_name: string
+          id?: string
+          is_demo?: boolean
+          person_id: string
+          profile_number?: number
+          published?: boolean
+        }
+        Update: {
+          archived_at?: string
+          avatar_path?: string | null
+          biography?: string | null
+          country?: string | null
+          date_of_birth?: string | null
+          date_of_death?: string | null
+          death_report_id?: string | null
+          full_name?: string
+          id?: string
+          is_demo?: boolean
+          person_id?: string
+          profile_number?: number
+          published?: boolean
+        }
+        Relationships: []
+      }
+      audit_log: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          details: Json | null
+          id: string
+          target: string | null
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          details?: Json | null
+          id?: string
+          target?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          details?: Json | null
+          id?: string
+          target?: string | null
+        }
+        Relationships: []
+      }
+      content_reports: {
+        Row: {
+          created_at: string
+          id: string
+          memory_id: string
+          reason: string
+          reporter_id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          memory_id: string
+          reason: string
+          reporter_id: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          memory_id?: string
+          reason?: string
+          reporter_id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_reports_memory_id_fkey"
+            columns: ["memory_id"]
+            isOneToOne: false
+            referencedRelation: "life_memories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      death_reports: {
+        Row: {
+          created_at: string
+          date_of_death: string
+          id: string
+          notes: string | null
+          proof_path: string
+          relationship: string | null
+          reporter_id: string
+          review_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          subject_email: string
+          subject_full_name: string
+          subject_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          date_of_death: string
+          id?: string
+          notes?: string | null
+          proof_path: string
+          relationship?: string | null
+          reporter_id: string
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          subject_email: string
+          subject_full_name: string
+          subject_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          date_of_death?: string
+          id?: string
+          notes?: string | null
+          proof_path?: string
+          relationship?: string | null
+          reporter_id?: string
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          subject_email?: string
+          subject_full_name?: string
+          subject_id?: string | null
+        }
+        Relationships: []
+      }
+      life_memories: {
+        Row: {
+          body: string | null
+          created_at: string
+          emotion: string | null
+          hidden: boolean
+          id: string
+          kind: string
+          media_path: string | null
+          memory_date: string | null
+          owner_id: string
+          privacy: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          emotion?: string | null
+          hidden?: boolean
+          id?: string
+          kind: string
+          media_path?: string | null
+          memory_date?: string | null
+          owner_id: string
+          privacy?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          emotion?: string | null
+          hidden?: boolean
+          id?: string
+          kind?: string
+          media_path?: string | null
+          memory_date?: string | null
+          owner_id?: string
+          privacy?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       memorials: {
         Row: {
           biography: string | null
@@ -105,37 +332,73 @@ export type Database = {
       }
       profiles: {
         Row: {
+          archived_at: string | null
           avatar_url: string | null
           bio: string | null
           country: string | null
           created_at: string
+          date_of_birth: string | null
+          date_of_death: string | null
           display_name: string | null
+          email: string | null
+          full_name: string | null
           id: string
           last_active_at: string
+          preferred_language: string
           status: string
           updated_at: string
         }
         Insert: {
+          archived_at?: string | null
           avatar_url?: string | null
           bio?: string | null
           country?: string | null
           created_at?: string
+          date_of_birth?: string | null
+          date_of_death?: string | null
           display_name?: string | null
+          email?: string | null
+          full_name?: string | null
           id: string
           last_active_at?: string
+          preferred_language?: string
           status?: string
           updated_at?: string
         }
         Update: {
+          archived_at?: string | null
           avatar_url?: string | null
           bio?: string | null
           country?: string | null
           created_at?: string
+          date_of_birth?: string | null
+          date_of_death?: string | null
           display_name?: string | null
+          email?: string | null
+          full_name?: string | null
           id?: string
           last_active_at?: string
+          preferred_language?: string
           status?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
         }
         Relationships: []
       }
@@ -144,10 +407,59 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_active_member: { Args: { _user_id: string }; Returns: boolean }
+      my_death_reports: {
+        Args: never
+        Returns: {
+          created_at: string
+          date_of_death: string
+          id: string
+          review_note: string
+          status: string
+          subject_full_name: string
+        }[]
+      }
+      report_memory: {
+        Args: { _memory_id: string; _reason: string }
+        Returns: undefined
+      }
+      resolve_content_report: {
+        Args: { _hide_memory: boolean; _report_id: string }
+        Returns: undefined
+      }
+      review_death_report: {
+        Args: { _approve: boolean; _note: string; _report_id: string }
+        Returns: undefined
+      }
+      set_archive_published: {
+        Args: { _entry_id: string; _published: boolean }
+        Returns: undefined
+      }
+      set_memory_hidden: {
+        Args: { _hidden: boolean; _memory_id: string }
+        Returns: undefined
+      }
+      submit_death_report: {
+        Args: {
+          _date_of_death: string
+          _email: string
+          _full_name: string
+          _notes: string
+          _proof_path: string
+          _relationship: string
+        }
+        Returns: string
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -274,6 +586,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user"],
+    },
   },
 } as const

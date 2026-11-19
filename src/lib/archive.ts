@@ -3,11 +3,12 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 import { fileExtension } from "./memory-rules";
 
-export type Memorial = Tables<"memorials">;
-export type Memory = Tables<"memories">;
 export type Profile = Tables<"profiles">;
+export type LifeMemory = Tables<"life_memories">;
+export type ArchiveEntry = Tables<"archive_entries">;
 
 export const MEDIA_BUCKET = "memories";
+export const PROOF_BUCKET = "verification";
 
 export async function requireUserId(): Promise<string> {
   const { data, error } = await supabase.auth.getUser();
@@ -24,93 +25,115 @@ export const profileQuery = () =>
       if (!user) throw new Error("Please sign in again.");
       const { data, error } = await supabase.from("profiles").select("*").eq("id", user.id).maybeSingle();
       if (error) throw error;
-      return { profile: data, email: user.email ?? "", createdAt: user.created_at };
+      return { profile: data, email: user.email ?? "", createdAt: user.created_at, userId: user.id };
     },
   });
 
-export const memorialsQuery = () =>
+export const isAdminQuery = () =>
   queryOptions({
-    queryKey: ["memorials"],
+    queryKey: ["is-admin"],
+    queryFn: async () => {
+      const { data: auth } = await supabase.auth.getUser();
+      if (!auth.user) return false;
+      const { data } = await supabase.rpc("has_role", { _user_id: auth.user.id, _role: "admin" });
+      return data === true;
+    },
+  });
+
+export const myMemoriesQuery = () =>
+  queryOptions({
+    queryKey: ["my-memories"],
     queryFn: async () => {
       const uid = await requireUserId();
       const { data, error } = await supabase
-        .from("memorials")
-        .select("*, memories(count)")
+        .from("life_memories")
+        .select("*")
         .eq("owner_id", uid)
+        .order("memory_date", { ascending: false, nullsFirst: false })
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data.map((m) => ({
-        ...m,
-        memoryCount: (m.memories as unknown as { count: number }[])[0]?.count ?? 0,
-      }));
+      return data;
     },
   });
 
-export const archiveStatsQuery = () =>
+export const archiveListQuery = () =>
   queryOptions({
-    queryKey: ["archive-stats"],
+    queryKey: ["archive"],
     queryFn: async () => {
-      const uid = await requireUserId();
-      const { data, error } = await supabase.from("memories").select("kind").eq("owner_id", uid);
+      const { data, error } = await supabase
+        .from("archive_entries")
+        .select("*")
+        .eq("published", true)
+        .order("profile_number", { ascending: true });
       if (error) throw error;
-      const counts = { story: 0, photo: 0, video: 0, audio: 0 } as Record<string, number>;
-      data.forEach((r) => {
-        counts[r.kind] = (counts[r.kind] ?? 0) + 1;
-      });
-      return counts;
+      return data;
     },
   });
 
-export const memorialDetailQuery = (id: string) =>
+export const archiveEntryQuery = (profileNumber: number) =>
   queryOptions({
-    queryKey: ["memorial", id],
+    queryKey: ["archive", profileNumber],
     queryFn: async () => {
-      const [{ data: memorial, error }, { data: memories, error: mErr }] = await Promise.all([
-        supabase.from("memorials").select("*").eq("id", id).maybeSingle(),
-        supabase
-          .from("memories")
-          .select("*")
-          .eq("memorial_id", id)
-          .order("memory_date", { ascending: false, nullsFirst: false })
-          .order("created_at", { ascending: false }),
-      ]);
+      const { data, error } = await supabase
+        .from("archive_entries")
+        .select("*")
+        .eq("profile_number", profileNumber)
+        .maybeSingle();
       if (error) throw error;
-      if (mErr) throw mErr;
-      return { memorial, memories: memories ?? [] };
+      return data;
     },
   });
 
-/** Uploads a file into the member's private folder for a memorial and returns its storage path. */
-export async function uploadMedia(file: File, folder: string): Promise<string> {
+export const legacyMemoriesQuery = (personId: string) =>
+  queryOptions({
+    queryKey: ["legacy-memories", personId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("life_memories")
+        .select("*")
+        .eq("owner_id", personId)
+        .eq("privacy", "legacy")
+        .eq("hidden", false)
+        .order("memory_date", { ascending: false, nullsFirst: false })
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+/** Uploads into the member's own folder and returns the storage path. */
+export async function uploadFile(file: File, folder: string, bucket = MEDIA_BUCKET): Promise<string> {
   const uid = await requireUserId();
   const path = `${uid}/${folder}/${crypto.randomUUID()}.${fileExtension(file.name)}`;
   const { error } = await supabase.storage
-    .from(MEDIA_BUCKET)
+    .from(bucket)
     .upload(path, file, { contentType: file.type || undefined, upsert: false });
   if (error) throw error;
   return path;
 }
 
 export async function removeMedia(paths: (string | null | undefined)[]) {
-  const clean = paths.filter((p): p is string => !!p);
+  const clean = paths.filter((p): p is string => !!p && !isDirectUrl(p));
   if (clean.length) await supabase.storage.from(MEDIA_BUCKET).remove(clean);
 }
 
-/** Short-lived links to private media. External URLs (e.g. Google avatars) pass through. */
-export function useMediaUrls(paths: (string | null | undefined)[]) {
+function isDirectUrl(p: string) {
+  return /^https?:\/\//.test(p) || p.startsWith("/");
+}
+
+/** Short-lived links to private media. Web links and bundled demo images pass through unchanged. */
+export function useMediaUrls(paths: (string | null | undefined)[], bucket = MEDIA_BUCKET) {
   const unique = Array.from(new Set(paths.filter((p): p is string => !!p))).sort();
-  const storagePaths = unique.filter((p) => !/^https?:\/\//.test(p));
+  const storagePaths = unique.filter((p) => !isDirectUrl(p));
   return useQuery({
-    queryKey: ["media-urls", storagePaths],
+    queryKey: ["media-urls", bucket, unique],
     enabled: unique.length > 0,
     staleTime: 45 * 60 * 1000,
     queryFn: async () => {
       const map: Record<string, string> = {};
-      unique.filter((p) => /^https?:\/\//.test(p)).forEach((p) => (map[p] = p));
+      unique.filter(isDirectUrl).forEach((p) => (map[p] = p));
       if (storagePaths.length) {
-        const { data, error } = await supabase.storage
-          .from(MEDIA_BUCKET)
-          .createSignedUrls(storagePaths, 60 * 60);
+        const { data, error } = await supabase.storage.from(bucket).createSignedUrls(storagePaths, 60 * 60);
         if (error) throw error;
         data.forEach((d) => {
           if (d.path && d.signedUrl) map[d.path] = d.signedUrl;
