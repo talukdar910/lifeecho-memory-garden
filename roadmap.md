@@ -1,12 +1,12 @@
 # LifeEcho roadmap
 - [ ] New slogan + Tree of life logo + favicon
-- [ ] Registration: full name, email, password, date of birth, country; profile picture required at first sign-in
+- [x] Registration: full name, email, password, date of birth, country; profile picture required at first sign-in
 - [x] Active profile: green = alive & active, black = deceased/archived
 - [x] Personal memory storage (story, experience, thought, photo, video, audio) with per-memory privacy + emotion
 - [x] LIFEECHO MEMORY ARCHIVE: numbered profiles (Profile 001), "Visit Previous Profile"
-- [ ] Death verification with proof + admin approval
-- [ ] Admin dashboard: users, verifications, archive, reported content, security log
-- [ ] Admin = mustofaaazeenfr@gmail.com
+- [x] Death verification with proof + admin approval
+- [ ] Admin dashboard: users, archive, reported content, security log (verifications done)
+- [x] Admin = mustofaaazeenfr@gmail.com
 - [x] Demo profiles (fictional)
 - [ ] AI translation of memories into the reader's language
 - [ ] Later: full interface translation, mobile apps, AI-assisted search

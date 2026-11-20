@@ -36,3 +36,4 @@ use the editor.
 - Public memorial pages load through `getPublicMemorial` (publishable server client) and only return rows with visibility `public`; why: SSR head tags for shared links without exposing private data.
 - A single auth listener lives in `AuthProvider` (`src/lib/auth-context.tsx`); why: avoids competing subscribers.
 - Every page under `src/routes/_authenticated/` is a child of the pathless layout; never leave that folder without child routes, because a childless layout claims "/" and breaks the build.
+- Member pages call `ensureCompleteProfile` in their loader so incomplete registrations are sent to `/profile?setup=true`; why: profile picture and other required fields are collected after first sign-in (including Google/Lovable sign-ins).
