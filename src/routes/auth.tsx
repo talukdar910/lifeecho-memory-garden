@@ -6,6 +6,9 @@ import { LovableMark } from "@lovable.dev/cloud-auth-js/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { COUNTRIES } from "@/lib/locales";
+import { MIN_PASSWORD_LENGTH, validateSignup } from "@/lib/memory-rules";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { LogoMark } from "@/components/lifeecho/logo";
@@ -60,6 +63,8 @@ function AuthPage() {
   const [busy, setBusy] = useState(false);
   const [sentTo, setSentTo] = useState<string | null>(null);
   const [name, setName] = useState("");
+  const [dob, setDob] = useState("");
+  const [country, setCountry] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const target = safePath(search.redirect);
@@ -69,10 +74,18 @@ function AuthPage() {
     setBusy(true);
     try {
       if (mode === "signup") {
+        const invalid = validateSignup({ fullName: name, email, password, dateOfBirth: dob, country });
+        if (invalid) {
+          toast.error(invalid);
+          return;
+        }
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
-          options: { emailRedirectTo: window.location.origin + target, data: { display_name: name } },
+          options: {
+            emailRedirectTo: window.location.origin + target,
+            data: { full_name: name.trim(), display_name: name.trim(), date_of_birth: dob, country },
+          },
         });
         if (error) throw error;
         if (data.session) navigate({ to: target });
@@ -158,7 +171,7 @@ function AuthPage() {
           <form onSubmit={onSubmit} className={`grid gap-4 ${mode === "forgot" ? "mt-7" : ""}`}>
             {mode === "signup" && (
               <div className="grid gap-2">
-                <Label htmlFor="name">Your name</Label>
+                <Label htmlFor="name">Full name</Label>
                 <Input id="name" required value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" className="h-11" />
               </div>
             )}
@@ -180,13 +193,39 @@ function AuthPage() {
                   id="password"
                   type="password"
                   required
-                  minLength={8}
+                  minLength={MIN_PASSWORD_LENGTH}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   autoComplete={mode === "signup" ? "new-password" : "current-password"}
                   className="h-11"
                 />
               </div>
+            )}
+            {mode === "signup" && (
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="grid gap-2">
+                  <Label htmlFor="dob">Date of birth</Label>
+                  <Input id="dob" type="date" required value={dob} onChange={(e) => setDob(e.target.value)} autoComplete="bday" className="h-11" />
+                </div>
+                <div className="grid gap-2">
+                  <Label>Country</Label>
+                  <Select value={country} onValueChange={setCountry}>
+                    <SelectTrigger className="h-11" aria-label="Country">
+                      <SelectValue placeholder="Choose country" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-72">
+                      {COUNTRIES.map((c) => (
+                        <SelectItem key={c.code} value={c.code}>
+                          {c.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            )}
+            {mode === "signup" && (
+              <p className="text-xs text-muted-foreground">You'll add a profile picture right after your first sign-in.</p>
             )}
             <Button type="submit" variant="hero" size="lg" className="mt-2 h-11 rounded-full" disabled={busy}>
               {busy && <Loader2 className="animate-spin" />}

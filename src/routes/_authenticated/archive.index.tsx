@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { archiveListQuery, useMediaUrls } from "@/lib/archive";
+import { archiveListQuery, ensureCompleteProfile, useMediaUrls } from "@/lib/archive";
 import { countryName } from "@/lib/locales";
 import { formatProfileNumber, lifespan, profileSlug } from "@/lib/memory-rules";
 
@@ -15,7 +15,10 @@ export const Route = createFileRoute("/_authenticated/archive/")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  loader: ({ context }) => context.queryClient.ensureQueryData(archiveListQuery()),
+  loader: async ({ context }) => {
+    await ensureCompleteProfile(context.queryClient);
+    await context.queryClient.ensureQueryData(archiveListQuery());
+  },
   component: ArchivePage,
 });
 

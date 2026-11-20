@@ -1,7 +1,8 @@
-import { queryOptions, useQuery } from "@tanstack/react-query";
+import { queryOptions, useQuery, type QueryClient } from "@tanstack/react-query";
+import { redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
-import { fileExtension } from "./memory-rules";
+import { fileExtension, missingProfileFields } from "./memory-rules";
 
 export type Profile = Tables<"profiles">;
 export type LifeMemory = Tables<"life_memories">;
@@ -142,4 +143,36 @@ export function useMediaUrls(paths: (string | null | undefined)[], bucket = MEDI
       return map;
     },
   });
+}
+
+export const myDeathReportsQuery = () =>
+  queryOptions({
+    queryKey: ["my-death-reports"],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("my_death_reports");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+/** Admins only (RLS): every passing report, newest first. */
+export const allDeathReportsQuery = () =>
+  queryOptions({
+    queryKey: ["admin-death-reports"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("death_reports")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(200);
+      if (error) throw error;
+      return data;
+    },
+  });
+
+/** Members finish registration (incl. a profile picture) before using the app. */
+export async function ensureCompleteProfile(queryClient: QueryClient) {
+  const me = await queryClient.ensureQueryData(profileQuery());
+  if (missingProfileFields(me.profile).length > 0) throw redirect({ to: "/profile", search: { setup: true } });
+  return me;
 }

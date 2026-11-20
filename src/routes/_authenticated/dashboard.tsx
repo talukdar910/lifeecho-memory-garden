@@ -9,7 +9,7 @@ import { AddMemoryDialog } from "@/components/lifeecho/add-memory-dialog";
 import { MemoryCard } from "@/components/lifeecho/memory-card";
 import { StatusBadge } from "@/components/lifeecho/status-badge";
 import { supabase } from "@/integrations/supabase/client";
-import { myMemoriesQuery, profileQuery, removeMedia, useMediaUrls } from "@/lib/archive";
+import { ensureCompleteProfile, myMemoriesQuery, profileQuery, removeMedia, useMediaUrls } from "@/lib/archive";
 import { KIND_PLURAL, MEMORY_KINDS, missingProfileFields, type MemoryKind } from "@/lib/memory-rules";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -24,11 +24,10 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
       { name: "robots", content: "noindex" },
     ],
   }),
-  loader: ({ context }) =>
-    Promise.all([
-      context.queryClient.ensureQueryData(profileQuery()),
-      context.queryClient.ensureQueryData(myMemoriesQuery()),
-    ]),
+  loader: async ({ context }) => {
+    await ensureCompleteProfile(context.queryClient);
+    await context.queryClient.ensureQueryData(myMemoriesQuery());
+  },
   component: Dashboard,
 });
 

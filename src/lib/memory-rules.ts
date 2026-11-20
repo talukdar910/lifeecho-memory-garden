@@ -149,3 +149,39 @@ export function fileExtension(name: string): string {
   const ext = idx >= 0 ? name.slice(idx + 1).toLowerCase() : "";
   return /^[a-z0-9]{1,8}$/.test(ext) ? ext : "bin";
 }
+
+export const MIN_PASSWORD_LENGTH = 8;
+
+export interface SignupInput {
+  fullName: string;
+  email: string;
+  password: string;
+  dateOfBirth: string;
+  country: string;
+}
+/** Registration: full name, email, password, date of birth and country are all required. */
+export function validateSignup(input: SignupInput, today = new Date()): string | null {
+  if (!input.fullName.trim()) return "Please enter your full name.";
+  if (!/^\S+@\S+\.\S+$/.test(input.email.trim())) return "Please enter a valid email address.";
+  if (input.password.length < MIN_PASSWORD_LENGTH) return `Passwords need at least ${MIN_PASSWORD_LENGTH} characters.`;
+  const dob = validateBirthDate(input.dateOfBirth, today);
+  if (dob) return dob;
+  if (!input.country) return "Please choose your country.";
+  return null;
+}
+
+/** The date of passing must be a real date that isn't in the future. */
+export function validateDeathDate(value: string, today = new Date()): string | null {
+  if (!value) return "Please enter the date of passing.";
+  const d = new Date(value + "T00:00:00Z");
+  if (Number.isNaN(d.getTime())) return "Please enter a valid date.";
+  if (d > today) return "The date of passing can't be in the future.";
+  return null;
+}
+
+export type DeathReportStatus = "pending" | "approved" | "rejected";
+export const REPORT_STATUS_LABEL: Record<DeathReportStatus, string> = {
+  pending: "Awaiting review",
+  approved: "Verified — added to the archive",
+  rejected: "Not approved",
+};

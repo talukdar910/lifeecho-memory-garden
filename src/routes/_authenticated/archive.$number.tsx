@@ -4,7 +4,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MemoryCard } from "@/components/lifeecho/memory-card";
 import { StatusBadge } from "@/components/lifeecho/status-badge";
-import { archiveEntryQuery, archiveListQuery, legacyMemoriesQuery, useMediaUrls } from "@/lib/archive";
+import { archiveEntryQuery, ensureCompleteProfile, archiveListQuery, legacyMemoriesQuery, useMediaUrls } from "@/lib/archive";
 import { countryName } from "@/lib/locales";
 import { formatProfileNumber, lifespan, parseProfileSlug, profileSlug } from "@/lib/memory-rules";
 
@@ -22,6 +22,7 @@ export const Route = createFileRoute("/_authenticated/archive/$number")({
   loader: async ({ context, params }) => {
     const n = parseProfileSlug(params.number);
     if (!n) throw notFound();
+    await ensureCompleteProfile(context.queryClient);
     const [entry] = await Promise.all([
       context.queryClient.ensureQueryData(archiveEntryQuery(n)),
       context.queryClient.ensureQueryData(archiveListQuery()),

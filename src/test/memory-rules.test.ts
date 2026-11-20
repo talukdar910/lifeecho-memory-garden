@@ -9,6 +9,8 @@ import {
   validateBirthDate,
   validateMemoryFile,
   validateProofFile,
+  validateSignup,
+  validateDeathDate,
 } from "@/lib/memory-rules";
 
 describe("LifeEcho rules", () => {
@@ -53,5 +55,23 @@ describe("LifeEcho rules", () => {
     expect(validateProofFile(null)).not.toBeNull();
     expect(validateProofFile({ type: "application/pdf", size: 1000 })).toBeNull();
     expect(validateProofFile({ type: "text/plain", size: 1000 })).not.toBeNull();
+  });
+
+  it("requires full name, valid email, 8+ character password, date of birth and country to sign up", () => {
+    const ok = { fullName: "Ana Ruiz", email: "ana@example.com", password: "12345678", dateOfBirth: "1990-02-03", country: "ES" };
+    const today = new Date("2026-01-01");
+    expect(validateSignup(ok, today)).toBeNull();
+    expect(validateSignup({ ...ok, fullName: " " }, today)).not.toBeNull();
+    expect(validateSignup({ ...ok, email: "ana" }, today)).not.toBeNull();
+    expect(validateSignup({ ...ok, password: "1234567" }, today)).not.toBeNull();
+    expect(validateSignup({ ...ok, dateOfBirth: "" }, today)).not.toBeNull();
+    expect(validateSignup({ ...ok, country: "" }, today)).not.toBeNull();
+  });
+
+  it("rejects a date of passing in the future", () => {
+    const today = new Date("2026-01-01");
+    expect(validateDeathDate("2026-06-01", today)).not.toBeNull();
+    expect(validateDeathDate("2025-12-31", today)).toBeNull();
+    expect(validateDeathDate("", today)).not.toBeNull();
   });
 });

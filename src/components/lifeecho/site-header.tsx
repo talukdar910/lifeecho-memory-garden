@@ -1,6 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { Menu, LogOut } from "lucide-react";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { isAdminQuery } from "@/lib/archive";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useAuth, useSignOut } from "@/lib/auth-context";
@@ -9,6 +11,7 @@ import { Logo } from "./logo";
 const memberLinks = [
   { to: "/dashboard", label: "Dashboard" },
   { to: "/archive", label: "Memory Archive" },
+  { to: "/verify", label: "Report a passing" },
   { to: "/profile", label: "Profile" },
 ] as const;
 
@@ -16,6 +19,8 @@ export function SiteHeader() {
   const { user, ready } = useAuth();
   const signOut = useSignOut();
   const [open, setOpen] = useState(false);
+  const { data: isAdmin } = useQuery({ ...isAdminQuery(), enabled: !!user });
+  const links = user && isAdmin ? [...memberLinks, { to: "/admin", label: "Admin" } as const] : memberLinks;
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/70 backdrop-blur-xl">
@@ -24,7 +29,7 @@ export function SiteHeader() {
 
         <nav className="hidden items-center gap-1 md:flex">
           {user &&
-            memberLinks.map((l) => (
+            links.map((l) => (
               <Link
                 key={l.to}
                 to={l.to}
@@ -67,7 +72,7 @@ export function SiteHeader() {
             <div className="mt-8 flex flex-col gap-2" onClick={() => setOpen(false)}>
               {user ? (
                 <>
-                  {memberLinks.map((l) => (
+                  {links.map((l) => (
                     <Link
                       key={l.to}
                       to={l.to}

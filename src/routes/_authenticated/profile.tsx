@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { Camera, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -15,6 +15,9 @@ import { COUNTRIES } from "@/lib/locales";
 import { MAX_UPLOAD_BYTES, validateBirthDate } from "@/lib/memory-rules";
 
 export const Route = createFileRoute("/_authenticated/profile")({
+  validateSearch: (s: Record<string, unknown>): { setup?: boolean | undefined } => ({
+    setup: s["setup"] === true || s["setup"] === "true" ? true : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Your profile — LifeEcho" },
@@ -32,6 +35,8 @@ export const Route = createFileRoute("/_authenticated/profile")({
 
 function ProfilePage() {
   const qc = useQueryClient();
+  const navigate = useNavigate();
+  const { setup } = Route.useSearch();
   const { data: me } = useSuspenseQuery(profileQuery());
   const p = me.profile;
   const [fullName, setFullName] = useState(p?.full_name ?? p?.display_name ?? "");
@@ -64,8 +69,9 @@ function ProfilePage() {
         .eq("id", me.userId);
       if (error) throw error;
       setAvatar(null);
-      toast.success("Profile saved.");
+      toast.success(setup ? "Welcome to LifeEcho." : "Profile saved.");
       await qc.invalidateQueries({ queryKey: ["profile"] });
+      if (setup) navigate({ to: "/dashboard" });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not save your profile");
     } finally {
@@ -75,6 +81,15 @@ function ProfilePage() {
 
   return (
     <div className="mx-auto max-w-2xl px-5 py-12">
+      {setup && (
+        <div className="mb-8 rounded-2xl border border-primary/30 bg-primary/5 p-5 text-sm">
+          <p className="font-semibold">One last step to finish registering</p>
+          <p className="mt-1 text-muted-foreground">
+            Add a profile picture and check your details. Every LifeEcho member needs a full name, date of birth,
+            country and photo.
+          </p>
+        </div>
+      )}
       <p className="eyebrow">Your profile</p>
       <div className="mt-3 flex flex-wrap items-center gap-3">
         <h1 className="text-4xl font-semibold">{fullName || "Your details"}</h1>
@@ -133,7 +148,7 @@ function ProfilePage() {
           <Textarea id="p-bio" rows={4} value={bio} onChange={(e) => setBio(e.target.value)} />
         </div>
         <Button type="submit" variant="hero" size="lg" className="h-11 rounded-full" disabled={busy}>
-          {busy && <Loader2 className="animate-spin" />} Save profile
+          {busy && <Loader2 className="animate-spin" />} {setup ? "Finish registration" : "Save profile"}
         </Button>
       </form>
     </div>
