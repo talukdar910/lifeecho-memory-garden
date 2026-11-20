@@ -35,3 +35,4 @@ use the editor.
 - Media lives in the private `memories` bucket at `{owner_id}/{memorial_id|avatar}/{file}` and is shown only via short-lived signed URLs (`useMediaUrls`); why: storage policies key off those folder segments.
 - Public memorial pages load through `getPublicMemorial` (publishable server client) and only return rows with visibility `public`; why: SSR head tags for shared links without exposing private data.
 - A single auth listener lives in `AuthProvider` (`src/lib/auth-context.tsx`); why: avoids competing subscribers.
+- Every page under `src/routes/_authenticated/` is a child of the pathless layout; never leave that folder without child routes, because a childless layout claims "/" and breaks the build.

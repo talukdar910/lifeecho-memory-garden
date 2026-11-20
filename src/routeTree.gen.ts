@@ -15,10 +15,8 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
-import { Route as MemorialMemorialIdRouteImport } from './routes/memorial.$memorialId'
-import { Route as AuthenticatedArchiveIndexRouteImport } from './routes/_authenticated/archive/index'
-import { Route as AuthenticatedArchiveMemorialIdRouteImport } from './routes/_authenticated/archive/$memorialId'
-import { Route as AuthenticatedArchiveNewRouteImport } from './routes/_authenticated/archive/new'
+import { Route as AuthenticatedArchiveIndexRouteImport } from './routes/_authenticated/archive.index'
+import { Route as AuthenticatedArchiveNumberRouteImport } from './routes/_authenticated/archive.$number'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -49,28 +47,18 @@ const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const MemorialMemorialIdRoute = MemorialMemorialIdRouteImport.update({
-  id: '/memorial/$memorialId',
-  path: '/memorial/$memorialId',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthenticatedArchiveIndexRoute =
   AuthenticatedArchiveIndexRouteImport.update({
     id: '/archive/',
     path: '/archive/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedArchiveMemorialIdRoute =
-  AuthenticatedArchiveMemorialIdRouteImport.update({
-    id: '/archive/$memorialId',
-    path: '/archive/$memorialId',
+const AuthenticatedArchiveNumberRoute =
+  AuthenticatedArchiveNumberRouteImport.update({
+    id: '/archive/$number',
+    path: '/archive/$number',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedArchiveNewRoute = AuthenticatedArchiveNewRouteImport.update({
-  id: '/archive/new',
-  path: '/archive/new',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -78,9 +66,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/profile': typeof AuthenticatedProfileRoute
-  '/memorial/$memorialId': typeof MemorialMemorialIdRoute
-  '/archive/$memorialId': typeof AuthenticatedArchiveMemorialIdRoute
-  '/archive/new': typeof AuthenticatedArchiveNewRoute
+  '/archive/$number': typeof AuthenticatedArchiveNumberRoute
   '/archive/': typeof AuthenticatedArchiveIndexRoute
 }
 export interface FileRoutesByTo {
@@ -89,9 +75,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/profile': typeof AuthenticatedProfileRoute
-  '/memorial/$memorialId': typeof MemorialMemorialIdRoute
-  '/archive/$memorialId': typeof AuthenticatedArchiveMemorialIdRoute
-  '/archive/new': typeof AuthenticatedArchiveNewRoute
+  '/archive/$number': typeof AuthenticatedArchiveNumberRoute
   '/archive': typeof AuthenticatedArchiveIndexRoute
 }
 export interface FileRoutesById {
@@ -102,9 +86,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
-  '/memorial/$memorialId': typeof MemorialMemorialIdRoute
-  '/_authenticated/archive/$memorialId': typeof AuthenticatedArchiveMemorialIdRoute
-  '/_authenticated/archive/new': typeof AuthenticatedArchiveNewRoute
+  '/_authenticated/archive/$number': typeof AuthenticatedArchiveNumberRoute
   '/_authenticated/archive/': typeof AuthenticatedArchiveIndexRoute
 }
 export interface FileRouteTypes {
@@ -115,9 +97,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/dashboard'
     | '/profile'
-    | '/memorial/$memorialId'
-    | '/archive/$memorialId'
-    | '/archive/new'
+    | '/archive/$number'
     | '/archive/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -126,9 +106,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/dashboard'
     | '/profile'
-    | '/memorial/$memorialId'
-    | '/archive/$memorialId'
-    | '/archive/new'
+    | '/archive/$number'
     | '/archive'
   id:
     | '__root__'
@@ -138,9 +116,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/_authenticated/dashboard'
     | '/_authenticated/profile'
-    | '/memorial/$memorialId'
-    | '/_authenticated/archive/$memorialId'
-    | '/_authenticated/archive/new'
+    | '/_authenticated/archive/$number'
     | '/_authenticated/archive/'
   fileRoutesById: FileRoutesById
 }
@@ -149,7 +125,6 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
-  MemorialMemorialIdRoute: typeof MemorialMemorialIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -196,13 +171,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfileRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/memorial/$memorialId': {
-      id: '/memorial/$memorialId'
-      path: '/memorial/$memorialId'
-      fullPath: '/memorial/$memorialId'
-      preLoaderRoute: typeof MemorialMemorialIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/_authenticated/archive/': {
       id: '/_authenticated/archive/'
       path: '/archive'
@@ -210,18 +178,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedArchiveIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/archive/$memorialId': {
-      id: '/_authenticated/archive/$memorialId'
-      path: '/archive/$memorialId'
-      fullPath: '/archive/$memorialId'
-      preLoaderRoute: typeof AuthenticatedArchiveMemorialIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/archive/new': {
-      id: '/_authenticated/archive/new'
-      path: '/archive/new'
-      fullPath: '/archive/new'
-      preLoaderRoute: typeof AuthenticatedArchiveNewRouteImport
+    '/_authenticated/archive/$number': {
+      id: '/_authenticated/archive/$number'
+      path: '/archive/$number'
+      fullPath: '/archive/$number'
+      preLoaderRoute: typeof AuthenticatedArchiveNumberRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
   }
@@ -230,16 +191,14 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
-  AuthenticatedArchiveMemorialIdRoute: typeof AuthenticatedArchiveMemorialIdRoute
-  AuthenticatedArchiveNewRoute: typeof AuthenticatedArchiveNewRoute
+  AuthenticatedArchiveNumberRoute: typeof AuthenticatedArchiveNumberRoute
   AuthenticatedArchiveIndexRoute: typeof AuthenticatedArchiveIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
-  AuthenticatedArchiveMemorialIdRoute: AuthenticatedArchiveMemorialIdRoute,
-  AuthenticatedArchiveNewRoute: AuthenticatedArchiveNewRoute,
+  AuthenticatedArchiveNumberRoute: AuthenticatedArchiveNumberRoute,
   AuthenticatedArchiveIndexRoute: AuthenticatedArchiveIndexRoute,
 }
 
@@ -251,7 +210,6 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   ResetPasswordRoute: ResetPasswordRoute,
-  MemorialMemorialIdRoute: MemorialMemorialIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

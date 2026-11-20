@@ -8,52 +8,71 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
-import { requireUserId, uploadMedia } from "@/lib/archive";
-import { acceptFor, KIND_LABEL, MEMORY_KINDS, validateMemoryFile, type MemoryKind } from "@/lib/memory-rules";
+import { requireUserId, uploadFile } from "@/lib/archive";
+import {
+  acceptFor,
+  DEFAULT_PRIVACY,
+  EMOTIONS,
+  EMOTION_LABEL,
+  isTextKind,
+  KIND_LABEL,
+  MEMORY_KINDS,
+  PRIVACY_HINT,
+  PRIVACY_LABEL,
+  validateMemoryFile,
+  type Emotion,
+  type MemoryKind,
+  type Privacy,
+} from "@/lib/memory-rules";
 import { KIND_ICON } from "./memory-card";
 
-export function AddMemoryDialog({ memorialId }: { memorialId: string }) {
+export function AddMemoryDialog() {
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const [kind, setKind] = useState<MemoryKind>("story");
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [date, setDate] = useState("");
+  const [emotion, setEmotion] = useState<Emotion | null>(null);
+  const [privacy, setPrivacy] = useState<Privacy>(DEFAULT_PRIVACY);
   const [file, setFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
+  const textOnly = isTextKind(kind);
 
   function reset() {
     setKind("story");
     setTitle("");
     setBody("");
     setDate("");
+    setEmotion(null);
+    setPrivacy(DEFAULT_PRIVACY);
     setFile(null);
   }
 
   async function submit(e: FormEvent) {
     e.preventDefault();
     const err = validateMemoryFile(kind, file);
-    if (err) { toast.error(err); return; }
+    if (err) {
+      toast.error(err);
+      return;
+    }
     setBusy(true);
     try {
       const uid = await requireUserId();
-      const media_path = kind !== "story" && file ? await uploadMedia(file, memorialId) : null;
-      const { error } = await supabase.from("memories").insert({
-        memorial_id: memorialId,
+      const media_path = !textOnly && file ? await uploadFile(file, "memories") : null;
+      const { error } = await supabase.from("life_memories").insert({
         owner_id: uid,
         kind,
         title: title.trim(),
         body: body.trim() || null,
         memory_date: date || null,
+        emotion,
+        privacy,
         media_path,
       });
       if (error) throw error;
       toast.success("Memory preserved.");
-      await Promise.all([
-        qc.invalidateQueries({ queryKey: ["memorial", memorialId] }),
-        qc.invalidateQueries({ queryKey: ["memorials"] }),
-        qc.invalidateQueries({ queryKey: ["archive-stats"] }),
-      ]);
+      await qc.invalidateQueries({ queryKey: ["my-memories"] });
       reset();
       setOpen(false);
     } catch (e) {
@@ -64,7 +83,13 @@ export function AddMemoryDialog({ memorialId }: { memorialId: string }) {
   }
 
   return (
-    <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) reset(); }}>
+    <Dialog
+      open={open}
+      onOpenChange={(o) => {
+        setOpen(o);
+        if (!o) reset();
+      }}
+    >
       <DialogTrigger asChild>
         <Button variant="hero" size="lg" className="rounded-full">
           <Plus /> Add memory
@@ -75,7 +100,7 @@ export function AddMemoryDialog({ memorialId }: { memorialId: string }) {
           <DialogTitle className="font-display text-3xl">Add a memory</DialogTitle>
         </DialogHeader>
         <form onSubmit={submit} className="grid gap-4">
-          <div className="grid grid-cols-4 gap-2" role="radiogroup" aria-label="Type of memory">
+          <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Type of memory">
             {MEMORY_KINDS.map((k) => {
               const Icon = KIND_ICON[k];
               const active = k === kind;
@@ -85,9 +110,14 @@ export function AddMemoryDialog({ memorialId }: { memorialId: string }) {
                   type="button"
                   role="radio"
                   aria-checked={active}
-                  onClick={() => { setKind(k); setFile(null); }}
+                  onClick={() => {
+                    setKind(k);
+                    setFile(null);
+                  }}
                   className={`flex flex-col items-center gap-1.5 rounded-xl border px-2 py-3 text-xs font-semibold transition-colors ${
-                    active ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:text-foreground"
+                    active
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   <Icon className="size-5" />
@@ -98,25 +128,89 @@ export function AddMemoryDialog({ memorialId }: { memorialId: string }) {
           </div>
           <div className="grid gap-2">
             <Label htmlFor="m-title">Title</Label>
-            <Input id="m-title" required value={title} onChange={(e) => setTitle(e.target.value)} className="h-11" placeholder={kind === "story" ? "The summer at the lake" : "Grandma's 80th birthday"} />
+            <Input
+              id="m-title"
+              required
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="h-11"
+              placeholder={textOnly ? "The summer at the lake" : "My 30th birthday"}
+            />
           </div>
-          {kind !== "story" && (
+          {!textOnly && (
             <div className="grid gap-2">
               <Label htmlFor="m-file">{KIND_LABEL[kind]} file</Label>
-              <label htmlFor="m-file" className="flex cursor-pointer items-center gap-3 rounded-xl border border-dashed border-input px-4 py-5 text-sm text-muted-foreground hover:border-primary/50">
+              <label
+                htmlFor="m-file"
+                className="flex cursor-pointer items-center gap-3 rounded-xl border border-dashed border-input px-4 py-5 text-sm text-muted-foreground hover:border-primary/50"
+              >
                 <Upload className="size-5 text-primary" />
-                <span className="truncate">{file ? file.name : `Choose a ${KIND_LABEL[kind].toLowerCase()} (up to 50 MB)`}</span>
+                <span className="truncate">
+                  {file ? file.name : `Choose a ${KIND_LABEL[kind].toLowerCase()} (up to 50 MB)`}
+                </span>
               </label>
-              <input id="m-file" type="file" accept={acceptFor(kind)} className="sr-only" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
+              <input
+                id="m-file"
+                type="file"
+                accept={acceptFor(kind)}
+                className="sr-only"
+                onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+              />
             </div>
           )}
           <div className="grid gap-2">
-            <Label htmlFor="m-body">{kind === "story" ? "The story" : "Caption (optional)"}</Label>
-            <Textarea id="m-body" rows={kind === "story" ? 7 : 3} required={kind === "story"} value={body} onChange={(e) => setBody(e.target.value)} />
+            <Label htmlFor="m-body">{textOnly ? "Write it down" : "Caption (optional)"}</Label>
+            <Textarea
+              id="m-body"
+              rows={textOnly ? 6 : 3}
+              required={textOnly}
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label>How does it feel? (optional)</Label>
+            <div className="flex flex-wrap gap-2">
+              {EMOTIONS.map((em) => (
+                <button
+                  key={em}
+                  type="button"
+                  aria-pressed={emotion === em}
+                  onClick={() => setEmotion(emotion === em ? null : em)}
+                  className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+                    emotion === em
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {EMOTION_LABEL[em]}
+                </button>
+              ))}
+            </div>
           </div>
           <div className="grid gap-2">
             <Label htmlFor="m-date">When did it happen? (optional)</Label>
             <Input id="m-date" type="date" value={date} onChange={(e) => setDate(e.target.value)} className="h-11" />
+          </div>
+          <div className="grid gap-2">
+            <Label>Who can see it</Label>
+            <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Who can see it">
+              {(["private", "legacy"] as const).map((p) => (
+                <button
+                  key={p}
+                  type="button"
+                  role="radio"
+                  aria-checked={privacy === p}
+                  onClick={() => setPrivacy(p)}
+                  className={`rounded-xl border px-3 py-3 text-left transition-colors ${
+                    privacy === p ? "border-primary bg-primary/10" : "border-border hover:border-primary/40"
+                  }`}
+                >
+                  <span className="block text-sm font-semibold">{PRIVACY_LABEL[p]}</span>
+                  <span className="mt-0.5 block text-xs text-muted-foreground">{PRIVACY_HINT[p]}</span>
+                </button>
+              ))}
+            </div>
           </div>
           <Button type="submit" variant="hero" size="lg" className="mt-2 h-11 rounded-full" disabled={busy}>
             {busy && <Loader2 className="animate-spin" />} Preserve memory
