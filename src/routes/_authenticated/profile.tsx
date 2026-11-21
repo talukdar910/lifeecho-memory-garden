@@ -9,8 +9,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { StatusBadge } from "@/components/lifeecho/status-badge";
+import { LegacyContacts } from "@/components/lifeecho/legacy-contacts";
 import { supabase } from "@/integrations/supabase/client";
-import { profileQuery, removeMedia, uploadFile, useMediaUrls } from "@/lib/archive";
+import { legacyContactsQuery, profileQuery, removeMedia, uploadFile, useMediaUrls } from "@/lib/archive";
 import { COUNTRIES } from "@/lib/locales";
 import { MAX_UPLOAD_BYTES, validateBirthDate } from "@/lib/memory-rules";
 
@@ -29,7 +30,11 @@ export const Route = createFileRoute("/_authenticated/profile")({
       { name: "robots", content: "noindex" },
     ],
   }),
-  loader: ({ context }) => context.queryClient.ensureQueryData(profileQuery()),
+  loader: ({ context }) =>
+    Promise.all([
+      context.queryClient.ensureQueryData(profileQuery()),
+      context.queryClient.ensureQueryData(legacyContactsQuery()),
+    ]),
   component: ProfilePage,
 });
 
@@ -151,6 +156,7 @@ function ProfilePage() {
           {busy && <Loader2 className="animate-spin" />} {setup ? "Finish registration" : "Save profile"}
         </Button>
       </form>
+      {!setup && <LegacyContacts ownEmail={me.email} locked={p?.status === "deceased"} />}
     </div>
   );
 }

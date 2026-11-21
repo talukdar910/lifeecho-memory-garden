@@ -93,7 +93,7 @@ export const legacyMemoriesQuery = (personId: string) =>
         .from("life_memories")
         .select("*")
         .eq("owner_id", personId)
-        .eq("privacy", "legacy")
+        .in("privacy", ["legacy", "public"])
         .eq("hidden", false)
         .order("memory_date", { ascending: false, nullsFirst: false })
         .order("created_at", { ascending: false });
@@ -176,3 +176,16 @@ export async function ensureCompleteProfile(queryClient: QueryClient) {
   if (missingProfileFields(me.profile).length > 0) throw redirect({ to: "/profile", search: { setup: true } });
   return me;
 }
+
+export const legacyContactsQuery = () =>
+  queryOptions({
+    queryKey: ["legacy-contacts"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("legacy_contacts")
+        .select("*")
+        .order("created_at", { ascending: true });
+      if (error) throw error;
+      return data;
+    },
+  });

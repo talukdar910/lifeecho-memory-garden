@@ -1,10 +1,10 @@
-import { BookOpen, Feather, Globe2, Image, Lock, Mic, Sparkles, Trash2, Video } from "lucide-react";
+import { BookOpen, Feather, Image, Mic, Sparkles, Trash2, Video } from "lucide-react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
+import { PrivacyMenu } from "./privacy";
 import {
   EMOTION_LABEL,
   KIND_LABEL,
-  PRIVACY_LABEL,
   type Emotion,
   type MemoryKind,
   type Privacy,
@@ -35,11 +35,13 @@ export function MemoryCard({
   memory,
   url,
   onDelete,
+  onPrivacyChange,
   showPrivacy = false,
 }: {
   memory: MemoryLike;
   url?: string | undefined;
   onDelete?: (() => void) | undefined;
+  onPrivacyChange?: ((p: Privacy) => void) | undefined;
   showPrivacy?: boolean;
 }) {
   const kind = memory.kind as MemoryKind;
@@ -86,12 +88,7 @@ export function MemoryCard({
                 {EMOTION_LABEL[memory.emotion as Emotion] ?? memory.emotion}
               </span>
             )}
-            {showPrivacy && privacy && (
-              <span className="inline-flex items-center gap-1 rounded-full border border-border px-2.5 py-1 text-muted-foreground">
-                {privacy === "legacy" ? <Globe2 className="size-3" /> : <Lock className="size-3" />}
-                {PRIVACY_LABEL[privacy] ?? privacy}
-              </span>
-            )}
+            {showPrivacy && privacy && <PrivacyMenu value={privacy} onChange={onPrivacyChange} />}
           </div>
         )}
       </div>

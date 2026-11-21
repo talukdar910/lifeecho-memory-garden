@@ -80,11 +80,11 @@ function ArchivedProfile() {
 
       <h2 className="mt-14 text-3xl font-semibold">Their legacy</h2>
       {memories.length === 0 ? (
-        <p className="mt-4 text-muted-foreground">No memories were shared in this legacy.</p>
+        <p className="mt-4 text-muted-foreground">No memories are shared with you here. Legacy memories are visible only to the contacts this member chose.</p>
       ) : (
         <div className="mt-6 columns-1 gap-4 space-y-4 sm:columns-2 lg:columns-3">
           {memories.map((m) => (
-            <MemoryCard key={m.id} memory={m} url={m.media_path ? urls?.[m.media_path] : undefined} />
+            <MemoryCard key={m.id} memory={m} url={m.media_path ? urls?.[m.media_path] : undefined} showPrivacy />
           ))}
         </div>
       )}

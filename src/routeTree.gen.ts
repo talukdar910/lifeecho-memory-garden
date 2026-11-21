@@ -17,6 +17,7 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedVerifyRouteImport } from './routes/_authenticated/verify'
+import { Route as EchoMemberIdRouteImport } from './routes/echo.$memberId'
 import { Route as AuthenticatedArchiveIndexRouteImport } from './routes/_authenticated/archive.index'
 import { Route as AuthenticatedArchiveNumberRouteImport } from './routes/_authenticated/archive.$number'
 
@@ -59,6 +60,11 @@ const AuthenticatedVerifyRoute = AuthenticatedVerifyRouteImport.update({
   path: '/verify',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const EchoMemberIdRoute = EchoMemberIdRouteImport.update({
+  id: '/echo/$memberId',
+  path: '/echo/$memberId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedArchiveIndexRoute =
   AuthenticatedArchiveIndexRouteImport.update({
     id: '/archive/',
@@ -80,6 +86,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/verify': typeof AuthenticatedVerifyRoute
+  '/echo/$memberId': typeof EchoMemberIdRoute
   '/archive/$number': typeof AuthenticatedArchiveNumberRoute
   '/archive/': typeof AuthenticatedArchiveIndexRoute
 }
@@ -91,6 +98,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/verify': typeof AuthenticatedVerifyRoute
+  '/echo/$memberId': typeof EchoMemberIdRoute
   '/archive/$number': typeof AuthenticatedArchiveNumberRoute
   '/archive': typeof AuthenticatedArchiveIndexRoute
 }
@@ -104,6 +112,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/verify': typeof AuthenticatedVerifyRoute
+  '/echo/$memberId': typeof EchoMemberIdRoute
   '/_authenticated/archive/$number': typeof AuthenticatedArchiveNumberRoute
   '/_authenticated/archive/': typeof AuthenticatedArchiveIndexRoute
 }
@@ -117,6 +126,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/profile'
     | '/verify'
+    | '/echo/$memberId'
     | '/archive/$number'
     | '/archive/'
   fileRoutesByTo: FileRoutesByTo
@@ -128,6 +138,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/profile'
     | '/verify'
+    | '/echo/$memberId'
     | '/archive/$number'
     | '/archive'
   id:
@@ -140,6 +151,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/profile'
     | '/_authenticated/verify'
+    | '/echo/$memberId'
     | '/_authenticated/archive/$number'
     | '/_authenticated/archive/'
   fileRoutesById: FileRoutesById
@@ -149,6 +161,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  EchoMemberIdRoute: typeof EchoMemberIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -209,6 +222,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedVerifyRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/echo/$memberId': {
+      id: '/echo/$memberId'
+      path: '/echo/$memberId'
+      fullPath: '/echo/$memberId'
+      preLoaderRoute: typeof EchoMemberIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/archive/': {
       id: '/_authenticated/archive/'
       path: '/archive'
@@ -252,6 +272,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  EchoMemberIdRoute: EchoMemberIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

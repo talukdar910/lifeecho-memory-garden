@@ -21,17 +21,49 @@ export const KIND_PLURAL: Record<MemoryKind, string> = {
   audio: "Audio",
 };
 
-export type Privacy = "private" | "legacy";
-/** New memories stay with their owner until they choose to share them in their legacy. */
+export const PRIVACY_OPTIONS = ["private", "legacy", "public"] as const;
+export type Privacy = (typeof PRIVACY_OPTIONS)[number];
+/** New memories stay with their owner until they choose to share them. */
 export const DEFAULT_PRIVACY: Privacy = "private";
 export const PRIVACY_LABEL: Record<Privacy, string> = {
   private: "Only me",
   legacy: "Legacy",
+  public: "Public",
 };
 export const PRIVACY_HINT: Record<Privacy, string> = {
-  private: "Never shown to anyone else.",
-  legacy: "Shared in the Memory Archive after your passing is verified.",
+  private: "Private to you unless you change it.",
+  legacy: "Shown to your legacy contacts only after your passing is formally verified.",
+  public: "Anyone can see it. Make it private or delete it at any time.",
 };
+
+export interface ViewContext {
+  isOwner: boolean;
+  isAdmin?: boolean;
+  /** The owner's passing was verified and their archive profile is published. */
+  ownerVerifiedDeceased: boolean;
+  /** The viewer's email is on the owner's legacy contact list. */
+  isLegacyContact: boolean;
+}
+/** Who may see a memory. Mirrors the database rules. */
+export function canViewMemory(memory: { privacy: string; hidden: boolean }, ctx: ViewContext): boolean {
+  if (ctx.isOwner || ctx.isAdmin) return true;
+  if (memory.hidden) return false;
+  if (memory.privacy === "public") return true;
+  if (memory.privacy === "legacy") return ctx.ownerVerifiedDeceased && ctx.isLegacyContact;
+  return false;
+}
+
+/** Legacy contacts are stored as trimmed, lower-case emails; you can't name yourself. */
+export function normalizeContactEmail(value: string): string {
+  return value.trim().toLowerCase();
+}
+export function validateLegacyContact(email: string, ownEmail: string, existing: string[]): string | null {
+  const e = normalizeContactEmail(email);
+  if (!/^\S+@\S+\.\S+$/.test(e)) return "Please enter a valid email address.";
+  if (e === normalizeContactEmail(ownEmail)) return "You can't add yourself as a legacy contact.";
+  if (existing.map(normalizeContactEmail).includes(e)) return "This person is already one of your legacy contacts.";
+  return null;
+}
 
 export const EMOTIONS = ["joy", "love", "gratitude", "pride", "hope", "nostalgia", "grief", "peace"] as const;
 export type Emotion = (typeof EMOTIONS)[number];

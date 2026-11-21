@@ -17,14 +17,13 @@ import {
   isTextKind,
   KIND_LABEL,
   MEMORY_KINDS,
-  PRIVACY_HINT,
-  PRIVACY_LABEL,
   validateMemoryFile,
   type Emotion,
   type MemoryKind,
   type Privacy,
 } from "@/lib/memory-rules";
 import { KIND_ICON } from "./memory-card";
+import { PrivacyPicker } from "./privacy";
 
 export function AddMemoryDialog() {
   const qc = useQueryClient();
@@ -194,23 +193,7 @@ export function AddMemoryDialog() {
           </div>
           <div className="grid gap-2">
             <Label>Who can see it</Label>
-            <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Who can see it">
-              {(["private", "legacy"] as const).map((p) => (
-                <button
-                  key={p}
-                  type="button"
-                  role="radio"
-                  aria-checked={privacy === p}
-                  onClick={() => setPrivacy(p)}
-                  className={`rounded-xl border px-3 py-3 text-left transition-colors ${
-                    privacy === p ? "border-primary bg-primary/10" : "border-border hover:border-primary/40"
-                  }`}
-                >
-                  <span className="block text-sm font-semibold">{PRIVACY_LABEL[p]}</span>
-                  <span className="mt-0.5 block text-xs text-muted-foreground">{PRIVACY_HINT[p]}</span>
-                </button>
-              ))}
-            </div>
+            <PrivacyPicker value={privacy} onChange={setPrivacy} />
           </div>
           <Button type="submit" variant="hero" size="lg" className="mt-2 h-11 rounded-full" disabled={busy}>
             {busy && <Loader2 className="animate-spin" />} Preserve memory

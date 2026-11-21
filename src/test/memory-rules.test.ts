@@ -11,6 +11,9 @@ import {
   validateProofFile,
   validateSignup,
   validateDeathDate,
+  canViewMemory,
+  validateLegacyContact,
+  PRIVACY_OPTIONS,
 } from "@/lib/memory-rules";
 
 describe("LifeEcho rules", () => {
@@ -73,5 +76,35 @@ describe("LifeEcho rules", () => {
     expect(validateDeathDate("2026-06-01", today)).not.toBeNull();
     expect(validateDeathDate("2025-12-31", today)).toBeNull();
     expect(validateDeathDate("", today)).not.toBeNull();
+  });
+
+  it("offers exactly three visibility options: Only me, Legacy and Public", () => {
+    expect([...PRIVACY_OPTIONS]).toEqual(["private", "legacy", "public"]);
+  });
+
+  it("shows Only me memories to the owner alone", () => {
+    const m = { privacy: "private", hidden: false };
+    expect(canViewMemory(m, { isOwner: true, ownerVerifiedDeceased: false, isLegacyContact: false })).toBe(true);
+    expect(canViewMemory(m, { isOwner: false, ownerVerifiedDeceased: true, isLegacyContact: true })).toBe(false);
+  });
+
+  it("shows Legacy memories only to designated contacts after a verified passing", () => {
+    const m = { privacy: "legacy", hidden: false };
+    expect(canViewMemory(m, { isOwner: false, ownerVerifiedDeceased: false, isLegacyContact: true })).toBe(false);
+    expect(canViewMemory(m, { isOwner: false, ownerVerifiedDeceased: true, isLegacyContact: false })).toBe(false);
+    expect(canViewMemory(m, { isOwner: false, ownerVerifiedDeceased: true, isLegacyContact: true })).toBe(true);
+  });
+
+  it("shows Public memories to everyone unless an admin hid them", () => {
+    const visitor = { isOwner: false, ownerVerifiedDeceased: false, isLegacyContact: false };
+    expect(canViewMemory({ privacy: "public", hidden: false }, visitor)).toBe(true);
+    expect(canViewMemory({ privacy: "public", hidden: true }, visitor)).toBe(false);
+  });
+
+  it("rejects invalid, duplicate or own email as a legacy contact", () => {
+    expect(validateLegacyContact("Sam@Example.com ", "me@example.com", [])).toBeNull();
+    expect(validateLegacyContact("not-an-email", "me@example.com", [])).not.toBeNull();
+    expect(validateLegacyContact("ME@example.com", "me@example.com", [])).not.toBeNull();
+    expect(validateLegacyContact("sam@example.com", "me@example.com", ["sam@example.com"])).not.toBeNull();
   });
 });

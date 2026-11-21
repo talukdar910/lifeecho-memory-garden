@@ -196,6 +196,30 @@ export type Database = {
         }
         Relationships: []
       }
+      legacy_contacts: {
+        Row: {
+          contact_email: string
+          contact_name: string | null
+          created_at: string
+          id: string
+          owner_id: string
+        }
+        Insert: {
+          contact_email: string
+          contact_name?: string | null
+          created_at?: string
+          id?: string
+          owner_id: string
+        }
+        Update: {
+          contact_email?: string
+          contact_name?: string | null
+          created_at?: string
+          id?: string
+          owner_id?: string
+        }
+        Relationships: []
+      }
       life_memories: {
         Row: {
           body: string | null
@@ -407,6 +431,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_view_media: { Args: { _path: string }; Returns: boolean }
+      has_public_memories: { Args: { _owner: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -415,6 +441,8 @@ export type Database = {
         Returns: boolean
       }
       is_active_member: { Args: { _user_id: string }; Returns: boolean }
+      is_legacy_contact: { Args: { _owner: string }; Returns: boolean }
+      is_verified_archived: { Args: { _person: string }; Returns: boolean }
       my_death_reports: {
         Args: never
         Returns: {
@@ -424,6 +452,18 @@ export type Database = {
           review_note: string
           status: string
           subject_full_name: string
+        }[]
+      }
+      public_member: {
+        Args: { _id: string }
+        Returns: {
+          avatar_path: string
+          bio: string
+          country: string
+          full_name: string
+          id: string
+          member_since: string
+          status: string
         }[]
       }
       report_memory: {
