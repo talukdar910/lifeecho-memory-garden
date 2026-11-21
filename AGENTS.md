@@ -32,8 +32,10 @@ use the editor.
 ## Project rules
 - Archive business rules (visibility default, upload limits, accepted media) live in `src/lib/memory-rules.ts` with tests in `src/test/memory-rules.test.ts`; why: one testable source for rules the owner cares about.
 - Member data is read/written from the browser client under RLS inside `_authenticated` (client-only) routes; why: session lives in browser storage and RLS scopes every row to its owner.
-- Media lives in the private `memories` bucket at `{owner_id}/{memorial_id|avatar}/{file}` and is shown only via short-lived signed URLs (`useMediaUrls`); why: storage policies key off those folder segments.
-- Public memorial pages load through `getPublicMemorial` (publishable server client) and only return rows with visibility `public`; why: SSR head tags for shared links without exposing private data.
+- Media lives in the private `memories` bucket at `{owner_id}/{memories|avatar}/{file}` and is shown only via short-lived signed URLs (`useMediaUrls`); why: storage policies key off those folder segments.
+- Public member pages (`/echo/$memberId`) load through `getPublicEcho` (publishable server client) and only return Public memories plus `public_member` basics; why: SSR head tags for shared links without exposing private data.
 - A single auth listener lives in `AuthProvider` (`src/lib/auth-context.tsx`); why: avoids competing subscribers.
 - Every page under `src/routes/_authenticated/` is a child of the pathless layout; never leave that folder without child routes, because a childless layout claims "/" and breaks the build.
 - Member pages call `ensureCompleteProfile` in their loader so incomplete registrations are sent to `/profile?setup=true`; why: profile picture and other required fields are collected after first sign-in (including Google/Lovable sign-ins).
+
+- Memory visibility (private / legacy / public) is enforced by RLS and the `can_view_media` storage check; `canViewMemory` in `memory-rules.ts` mirrors it for tests; why: one rule, enforced in the database.

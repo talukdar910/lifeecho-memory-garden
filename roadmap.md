@@ -2,6 +2,7 @@
 - [ ] New slogan + Tree of life logo + favicon
 - [x] Registration: full name, email, password, date of birth, country; profile picture required at first sign-in
 - [x] Active profile: green = alive & active, black = deceased/archived
+- [x] Visibility: Only me / Legacy (designated contacts after verification) / Public + shareable public page
 - [x] Personal memory storage (story, experience, thought, photo, video, audio) with per-memory privacy + emotion
 - [x] LIFEECHO MEMORY ARCHIVE: numbered profiles (Profile 001), "Visit Previous Profile"
 - [x] Death verification with proof + admin approval
