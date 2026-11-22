@@ -19,6 +19,8 @@ const buttonVariants = cva(
         hero: "bg-aurora text-primary-foreground font-semibold shadow-glow hover:brightness-110 hover:-translate-y-px transition-all",
         glass:
           "glass-panel text-foreground hover:border-primary/40 hover:text-primary transition-all",
+        premium:
+          "btn-sheen bg-premium text-foreground font-semibold tracking-wide shadow-premium transition-all duration-300 hover:brightness-110 hover:-translate-y-px active:translate-y-0 active:scale-[0.98]",
         paper: "bg-paper-foreground text-paper font-semibold hover:bg-paper-foreground/90",
         google:
           "border border-google-border bg-google text-google-foreground font-medium hover:bg-google/90",

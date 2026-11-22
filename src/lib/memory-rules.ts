@@ -217,3 +217,49 @@ export const REPORT_STATUS_LABEL: Record<DeathReportStatus, string> = {
   approved: "Verified — added to the archive",
   rejected: "Not approved",
 };
+
+/** Readers see memories in their chosen language, else their browser's, else English. */
+export const SUPPORTED_LANGUAGE_CODES = [
+  "en", "fr", "es", "pt", "de", "it", "nl", "ar", "bn", "hi", "ur", "zh", "ja", "ko", "ru", "tr", "fa", "sw",
+  "id", "ms", "th", "vi", "pl", "uk", "ro", "el", "he", "sv", "no", "da", "fi", "cs", "hu", "ta", "te", "pa",
+  "am", "yo", "ha", "zu", "tl", "ne",
+] as const;
+export function isSupportedLanguage(code: string | null | undefined): boolean {
+  return !!code && (SUPPORTED_LANGUAGE_CODES as readonly string[]).includes(code);
+}
+export function resolveReaderLanguage(preferred: string | null | undefined, browser: string | null | undefined): string {
+  if (isSupportedLanguage(preferred)) return preferred!;
+  const base = browser?.toLowerCase().split("-")[0];
+  if (base === "nb" || base === "nn") return "no";
+  if (isSupportedLanguage(base)) return base!;
+  return "en";
+}
+/** A saved translation is reused only while the memory hasn't been edited since. */
+export function isTranslationFresh(memoryUpdatedAt: string, translatedFrom: string | null | undefined): boolean {
+  if (!translatedFrom) return false;
+  return new Date(translatedFrom).getTime() >= new Date(memoryUpdatedAt).getTime();
+}
+
+export const MIN_REPORT_REASON = 3;
+export function validateReportReason(reason: string): string | null {
+  if (reason.trim().length < MIN_REPORT_REASON) return "Please tell us briefly what is wrong.";
+  if (reason.length > 1000) return "Please keep it under 1000 characters.";
+  return null;
+}
+
+export const AUDIT_ACTION_LABEL: Record<string, string> = {
+  "death_report.submitted": "Passing reported",
+  "death_report.approved": "Passing verified",
+  "death_report.rejected": "Passing report rejected",
+  "content.reported": "Memory reported",
+  "content.hidden": "Memory hidden",
+  "content.restored": "Memory restored",
+  "content.report_dismissed": "Report dismissed",
+  "archive.published": "Archive profile shown",
+  "archive.unpublished": "Archive profile hidden",
+  "role.admin_granted": "Admin access given",
+  "role.admin_removed": "Admin access removed",
+};
+export function auditLabel(action: string): string {
+  return AUDIT_ACTION_LABEL[action] ?? action;
+}

@@ -6,8 +6,10 @@
 - [x] Personal memory storage (story, experience, thought, photo, video, audio) with per-memory privacy + emotion
 - [x] LIFEECHO MEMORY ARCHIVE: numbered profiles (Profile 001), "Visit Previous Profile"
 - [x] Death verification with proof + admin approval
+- [ ] Premium login (show/hide password) + cinematic 2.2s opening animation with slogan after sign-in
 - [ ] Admin dashboard: users, archive, reported content, security log (verifications done)
 - [x] Admin = mustofaaazeenfr@gmail.com
 - [x] Demo profiles (fictional)
 - [ ] AI translation of memories into the reader's language
+- [ ] GitHub: code syncs automatically to the connected repository after each change
 - [ ] Later: full interface translation, mobile apps, AI-assisted search

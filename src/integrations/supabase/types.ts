@@ -354,6 +354,41 @@ export type Database = {
           },
         ]
       }
+      memory_translations: {
+        Row: {
+          body: string | null
+          created_at: string
+          language: string
+          memory_id: string
+          source_updated_at: string
+          title: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          language: string
+          memory_id: string
+          source_updated_at: string
+          title: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          language?: string
+          memory_id?: string
+          source_updated_at?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "memory_translations_memory_id_fkey"
+            columns: ["memory_id"]
+            isOneToOne: false
+            referencedRelation: "life_memories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           archived_at: string | null
@@ -431,6 +466,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_set_admin: {
+        Args: { _make_admin: boolean; _user_id: string }
+        Returns: undefined
+      }
       can_view_media: { Args: { _path: string }; Returns: boolean }
       has_public_memories: { Args: { _owner: string }; Returns: boolean }
       has_role: {

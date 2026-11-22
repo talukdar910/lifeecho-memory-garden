@@ -7,13 +7,13 @@ import heroTree from "@/assets/hero-tree.jpg";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "LifeEcho — Keep their stories alive for generations" },
+      { title: "LifeEcho — Your Life. Your Emotions. Your Legacy." },
       {
         name: "description",
         content:
           "LifeEcho is a global digital memory platform to securely preserve the stories, photos, videos and voices of loved ones who have passed.",
       },
-      { property: "og:title", content: "LifeEcho — Keep their stories alive for generations" },
+      { property: "og:title", content: "LifeEcho — Your Life. Your Emotions. Your Legacy." },
       {
         property: "og:description",
         content: "Securely preserve stories, photos, videos and audio of loved ones in a private Memory Archive.",
@@ -33,8 +33,8 @@ const formats = [
 ];
 
 const promises = [
-  { icon: Lock, title: "Private by default", text: "Every memorial starts private. Only you decide if and when it is shared." },
-  { icon: Globe2, title: "Shared across borders", text: "Invite family anywhere in the world with a single link when you're ready." },
+  { icon: Lock, title: "Private by default", text: "Every memory starts as Only me. You decide if it becomes Legacy or Public." },
+  { icon: Globe2, title: "Shared across borders", text: "Read memories in your own language with AI translation, wherever you are." },
   { icon: InfinityIcon, title: "Built to last", text: "Securely stored so the people you love are remembered by generations to come." },
 ];
 
@@ -53,16 +53,17 @@ function Index() {
         <div className="mx-auto flex min-h-[86vh] max-w-6xl flex-col justify-start px-5 pt-20 pb-24 md:justify-center md:pt-10">
           <p className="eyebrow animate-fade-up">A global digital memory platform</p>
           <h1 className="mt-5 max-w-3xl animate-fade-up text-5xl leading-[1.02] font-semibold md:text-7xl">
-            Every life leaves an <em className="text-aurora not-italic md:italic">echo.</em>
+            Your Life. Your Emotions.{" "}
+            <em className="text-aurora not-italic md:italic">Your Legacy.</em>
           </h1>
           <p className="mt-6 max-w-xl animate-fade-up text-lg text-muted-foreground [animation-delay:120ms]">
-            Preserve the stories, photos, videos and voices of the people you've lost — safely, privately, and
-            for every generation still to come.
+            Keep your stories, photos, videos and voice safe — private to you, passed on to the people you choose,
+            or shared with the world. Every life leaves an echo.
           </p>
           <div className="mt-9 flex animate-fade-up flex-wrap gap-3 [animation-delay:220ms]">
             <Button asChild variant="hero" size="xl">
               <Link to="/auth" search={{ mode: "signup" }}>
-                Begin a Memory Archive <ArrowRight />
+                Begin your LifeEcho <ArrowRight />
               </Link>
             </Button>
             <Button asChild variant="glass" size="xl">
@@ -124,8 +125,8 @@ function Index() {
         <div className="mt-10 grid gap-10 md:grid-cols-3">
           {[
             ["01", "Create your account", "Join LifeEcho in under a minute with email, Google or Lovable."],
-            ["02", "Open a memorial", "Add their name, dates, a few words and a portrait to begin."],
-            ["03", "Gather the memories", "Add stories, photos, videos and audio — alone or as a family."],
+            ["02", "Capture your memories", "Stories, experiences, thoughts, photos, videos and audio — each with its emotion."],
+            ["03", "Choose your legacy", "Keep it private, leave it to the people you trust, or share it openly."],
           ].map(([n, t, d]) => (
             <div key={n} className="border-t border-border pt-6">
               <span className="font-display text-5xl text-aurora">{n}</span>

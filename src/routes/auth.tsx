@@ -1,7 +1,7 @@
 import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
-import { Loader2, MailCheck } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, Loader2, Lock, Mail, MailCheck } from "lucide-react";
 import { LovableMark } from "@lovable.dev/cloud-auth-js/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { LogoMark } from "@/components/lifeecho/logo";
 import { Particles } from "@/components/lifeecho/particles";
+import { armIntro, playIntro } from "@/lib/intro";
 
 type Mode = "signin" | "signup" | "forgot";
 
@@ -67,6 +68,7 @@ function AuthPage() {
   const [country, setCountry] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const target = safePath(search.redirect);
 
   async function onSubmit(e: FormEvent) {
@@ -88,11 +90,14 @@ function AuthPage() {
           },
         });
         if (error) throw error;
-        if (data.session) navigate({ to: target });
-        else setSentTo(email);
+        if (data.session) {
+          await playIntro();
+          navigate({ to: target });
+        } else setSentTo(email);
       } else if (mode === "signin") {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        await playIntro();
         navigate({ to: target });
       } else {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -110,12 +115,14 @@ function AuthPage() {
   }
 
   async function social(provider: "google" | "lovable") {
+    armIntro();
     const result = await lovable.auth.signInWithOAuth(provider, { redirect_uri: window.location.origin + "/auth" });
     if (result.error) {
       toast.error(result.error.message);
       return;
     }
     if (result.redirected) return;
+    await playIntro();
     navigate({ to: target });
   }
 
@@ -140,77 +147,102 @@ function AuthPage() {
   const title = mode === "signup" ? "Create your account" : mode === "signin" ? "Welcome back" : "Reset your password";
 
   return (
-    <div className="relative">
+    <div className="relative isolate overflow-hidden">
+      <span aria-hidden className="orb -top-32 -left-24 -z-10 size-[28rem] opacity-60" />
+      <span aria-hidden className="orb -right-32 bottom-0 -z-10 size-[32rem] opacity-40 [animation-delay:-6s]" />
       <Particles />
-      <div className="relative mx-auto flex min-h-[80vh] max-w-md flex-col justify-center px-5 py-14">
-        <div className="glass-panel rounded-3xl p-7 md:p-9">
-          <LogoMark className="size-10" />
-          <h1 className="mt-5 text-4xl font-semibold">{title}</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
+      <div className="relative mx-auto flex min-h-[86vh] max-w-md flex-col justify-center px-5 py-14">
+        <div className="mb-7 flex flex-col items-center text-center">
+          <div className="relative">
+            <span aria-hidden className="absolute -inset-4 rounded-full bg-aurora opacity-25 blur-2xl" />
+            <LogoMark className="relative size-16" />
+          </div>
+          <p className="mt-4 text-[0.68rem] font-semibold tracking-[0.28em] text-muted-foreground uppercase">
+            Your Life. Your Emotions. Your Legacy.
+          </p>
+        </div>
+        <div className="glass-panel glow-frame rounded-[2rem] p-7 shadow-glow md:p-9">
+          <h1 className="text-center text-4xl font-semibold">{title}</h1>
+          <p className="mt-2 text-center text-sm text-muted-foreground">
             {mode === "signup"
-              ? "Begin preserving the stories of the people you love."
+              ? "Begin preserving your life, your emotions and your legacy."
               : mode === "signin"
-                ? "Sign in to your Memory Archive."
+                ? "Sign in to continue your story."
                 : "We'll email you a secure link."}
           </p>
 
-          {mode !== "forgot" && (
-            <div className="mt-7 grid gap-3">
-              <Button type="button" variant="google" size="lg" className="h-11 rounded-full" onClick={() => social("google")}>
-                <GoogleLogo /> Continue with Google
-              </Button>
-              <Button type="button" variant="outline" size="lg" className="h-11 rounded-full bg-transparent" onClick={() => social("lovable")}>
-                <LovableMark className="!size-[18px]" /> Continue with Lovable
-              </Button>
-              <div className="my-2 flex items-center gap-3 text-xs text-muted-foreground">
-                <span className="h-px flex-1 bg-border" /> or with email <span className="h-px flex-1 bg-border" />
-              </div>
-            </div>
-          )}
-
-          <form onSubmit={onSubmit} className={`grid gap-4 ${mode === "forgot" ? "mt-7" : ""}`}>
+          <form onSubmit={onSubmit} className="mt-8 grid gap-4">
             {mode === "signup" && (
               <div className="grid gap-2">
                 <Label htmlFor="name">Full name</Label>
-                <Input id="name" required value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" className="h-11" />
+                <Input id="name" required value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" className="h-12 rounded-xl bg-background/40" />
               </div>
             )}
             <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" className="h-11" />
+              <Label htmlFor="email">Email address</Label>
+              <div className="relative">
+                <Mail aria-hidden className="pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  id="email"
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  autoComplete="email"
+                  placeholder="you@example.com"
+                  className="h-12 rounded-xl bg-background/40 pl-11 transition-shadow focus-visible:shadow-glow"
+                />
+              </div>
             </div>
             {mode !== "forgot" && (
               <div className="grid gap-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="password">Password</Label>
                   {mode === "signin" && (
-                    <button type="button" onClick={() => setMode("forgot")} className="text-xs text-primary hover:underline">
+                    <button
+                      type="button"
+                      onClick={() => setMode("forgot")}
+                      className="text-xs font-medium text-primary transition-colors hover:text-primary-glow"
+                    >
                       Forgot password?
                     </button>
                   )}
                 </div>
-                <Input
-                  id="password"
-                  type="password"
-                  required
-                  minLength={MIN_PASSWORD_LENGTH}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  autoComplete={mode === "signup" ? "new-password" : "current-password"}
-                  className="h-11"
-                />
+                <div className="relative">
+                  <Lock aria-hidden className="pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    required
+                    minLength={MIN_PASSWORD_LENGTH}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    autoComplete={mode === "signup" ? "new-password" : "current-password"}
+                    placeholder="••••••••"
+                    className="h-12 rounded-xl bg-background/40 pr-12 pl-11 transition-shadow focus-visible:shadow-glow"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    aria-pressed={showPassword}
+                    className="absolute top-1/2 right-2 flex size-9 -translate-y-1/2 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-primary"
+                  >
+                    {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                  </button>
+                </div>
               </div>
             )}
             {mode === "signup" && (
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="grid gap-2">
                   <Label htmlFor="dob">Date of birth</Label>
-                  <Input id="dob" type="date" required value={dob} onChange={(e) => setDob(e.target.value)} autoComplete="bday" className="h-11" />
+                  <Input id="dob" type="date" required value={dob} onChange={(e) => setDob(e.target.value)} autoComplete="bday" className="h-12 rounded-xl bg-background/40" />
                 </div>
                 <div className="grid gap-2">
                   <Label>Country</Label>
                   <Select value={country} onValueChange={setCountry}>
-                    <SelectTrigger className="h-11" aria-label="Country">
+                    <SelectTrigger className="h-12 rounded-xl bg-background/40" aria-label="Country">
                       <SelectValue placeholder="Choose country" />
                     </SelectTrigger>
                     <SelectContent className="max-h-72">
@@ -227,19 +259,36 @@ function AuthPage() {
             {mode === "signup" && (
               <p className="text-xs text-muted-foreground">You'll add a profile picture right after your first sign-in.</p>
             )}
-            <Button type="submit" variant="hero" size="lg" className="mt-2 h-11 rounded-full" disabled={busy}>
-              {busy && <Loader2 className="animate-spin" />}
+            <Button type="submit" variant="premium" size="lg" className="mt-3 h-12 rounded-full text-base" disabled={busy}>
+              {busy ? <Loader2 className="animate-spin" /> : null}
               {mode === "signup" ? "Create account" : mode === "signin" ? "Sign in" : "Send reset link"}
+              {!busy && <ArrowRight />}
             </Button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-muted-foreground">
+          {mode !== "forgot" && (
+            <div className="mt-6 grid gap-3">
+              <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                <span className="h-px flex-1 bg-border" /> or continue with <span className="h-px flex-1 bg-border" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <Button type="button" variant="google" className="h-11 rounded-full" onClick={() => social("google")}>
+                  <GoogleLogo /> Google
+                </Button>
+                <Button type="button" variant="outline" className="h-11 rounded-full bg-transparent" onClick={() => social("lovable")}>
+                  <LovableMark className="!size-[18px]" /> Lovable
+                </Button>
+              </div>
+            </div>
+          )}
+
+          <p className="mt-7 text-center text-sm text-muted-foreground">
             {mode === "signup" ? (
-              <>Already a member? <button className="text-primary hover:underline" onClick={() => setMode("signin")}>Sign in</button></>
+              <>Already a member? <button className="font-medium text-primary hover:underline" onClick={() => setMode("signin")}>Sign in</button></>
             ) : mode === "signin" ? (
-              <>New to LifeEcho? <button className="text-primary hover:underline" onClick={() => setMode("signup")}>Create an account</button></>
+              <>New to LifeEcho? <button className="font-medium text-primary hover:underline" onClick={() => setMode("signup")}>Create an account</button></>
             ) : (
-              <button className="text-primary hover:underline" onClick={() => setMode("signin")}>Back to sign in</button>
+              <button className="font-medium text-primary hover:underline" onClick={() => setMode("signin")}>Back to sign in</button>
             )}
           </p>
         </div>

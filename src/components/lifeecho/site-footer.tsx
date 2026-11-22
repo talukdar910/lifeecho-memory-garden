@@ -8,7 +8,7 @@ export function SiteFooter() {
           <LogoMark className="size-6" />
           <span className="font-display text-lg text-foreground">LifeEcho</span>
         </div>
-        <p>Preserving every life story, for every generation to come.</p>
+        <p className="font-display text-base tracking-wide text-foreground/80 italic">Your Life. Your Emotions. Your Legacy.</p>
         <p>© {new Date().getFullYear()} LifeEcho</p>
       </div>
     </footer>

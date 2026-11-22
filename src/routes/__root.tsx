@@ -16,6 +16,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/lib/auth-context";
 import { SiteHeader } from "@/components/lifeecho/site-header";
 import { SiteFooter } from "@/components/lifeecho/site-footer";
+import { OpeningIntro } from "@/components/lifeecho/opening-intro";
 
 function NotFoundComponent() {
   return (
@@ -83,14 +84,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "LifeEcho — A global digital memory platform" },
+      { title: "LifeEcho — Your Life. Your Emotions. Your Legacy." },
       {
         name: "description",
         content: "Preserve the stories, photos, videos and voices of loved ones for future generations.",
       },
       { name: "author", content: "LifeEcho" },
       { name: "theme-color", content: "#0b1413" },
-      { property: "og:title", content: "LifeEcho — A global digital memory platform" },
+      { property: "og:title", content: "LifeEcho — Your Life. Your Emotions. Your Legacy." },
       {
         property: "og:description",
         content: "Preserve the stories, photos, videos and voices of loved ones for future generations.",
@@ -109,7 +110,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: appCss,
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/favicon.png", type: "image/png" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
     ],
   }),
   shellComponent: RootShell,
@@ -147,6 +149,7 @@ function RootComponent() {
           <SiteFooter />
         </div>
         <Toaster theme="dark" position="top-center" />
+        <OpeningIntro />
       </AuthProvider>
     </QueryClientProvider>
   );
