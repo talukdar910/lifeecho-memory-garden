@@ -39,3 +39,6 @@ use the editor.
 - Member pages call `ensureCompleteProfile` in their loader so incomplete registrations are sent to `/profile?setup=true`; why: profile picture and other required fields are collected after first sign-in (including Google/Lovable sign-ins).
 
 - Memory visibility (private / legacy / public) is enforced by RLS and the `can_view_media` storage check; `canViewMemory` in `memory-rules.ts` mirrors it for tests; why: one rule, enforced in the database.
+- AI translation runs only in `translateMemory` (`src/lib/translate.functions.ts`, signed-in readers); it re-reads the memory under the reader's RLS before calling Lovable AI and caches results in `memory_translations` (server-only table); why: never translate what the reader can't see, and never pay twice.
+- Admin panel data comes from `src/lib/admin.ts` via admin-only RLS policies, and admin writes go through security-definer RPCs that log to `audit_log`; why: the security log stays complete.
+- The post-sign-in opening plays from `OpeningIntro` in `__root` via `playIntro()` / `armIntro()` (`src/lib/intro.ts`); why: one overlay works for email and redirecting OAuth sign-ins.

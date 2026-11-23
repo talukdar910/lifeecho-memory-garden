@@ -1,22 +1,41 @@
 import { useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { AlertTriangle, Check, FileText, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AdminOverview } from "@/components/admin/overview";
+import { AdminMembers } from "@/components/admin/members";
+import { AdminArchive } from "@/components/admin/archive-admin";
+import { AdminReports } from "@/components/admin/reports";
+import { AdminSecurityLog } from "@/components/admin/security-log";
 import { supabase } from "@/integrations/supabase/client";
 import { allDeathReportsQuery, isAdminQuery, PROOF_BUCKET } from "@/lib/archive";
 import { REPORT_STATUS_LABEL, type DeathReportStatus } from "@/lib/memory-rules";
 import type { Tables } from "@/integrations/supabase/types";
 
+const TABS = [
+  ["overview", "Overview"],
+  ["verifications", "Verifications"],
+  ["members", "Members"],
+  ["archive", "Archive"],
+  ["reports", "Reported content"],
+  ["security", "Security log"],
+] as const;
+type Tab = (typeof TABS)[number][0];
+
 export const Route = createFileRoute("/_authenticated/admin")({
+  validateSearch: (s: Record<string, unknown>): { tab?: Tab | undefined } => ({
+    tab: TABS.some(([t]) => t === s["tab"]) ? (s["tab"] as Tab) : undefined,
+  }),
   head: () => ({
     meta: [
-      { title: "Admin — death verifications · LifeEcho" },
-      { name: "description", content: "Review proof of passing and approve profiles for the LifeEcho Memory Archive." },
-      { property: "og:title", content: "Admin — death verifications · LifeEcho" },
+      { title: "Admin panel · LifeEcho" },
+      { name: "description", content: "Manage LifeEcho members, verifications, the Memory Archive, reported content and the security log." },
+      { property: "og:title", content: "Admin panel · LifeEcho" },
       { property: "og:description", content: "LifeEcho administration." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -40,7 +59,37 @@ function AdminPage() {
       </div>
     );
   }
-  return <Verifications />;
+  return <AdminPanel />;
+}
+
+function AdminPanel() {
+  const { tab = "overview" } = Route.useSearch();
+  const navigate = useNavigate({ from: Route.fullPath });
+  const open = (t: string) => navigate({ search: { tab: t as Tab }, replace: true });
+  return (
+    <div className="mx-auto max-w-6xl px-5 py-12">
+      <p className="eyebrow">Admin panel</p>
+      <h1 className="mt-3 text-4xl font-semibold md:text-5xl">LifeEcho control room</h1>
+      <p className="mt-3 max-w-xl text-muted-foreground">Members, verifications, the Memory Archive and safety — in one place.</p>
+      <Tabs value={tab} onValueChange={open} className="mt-8">
+        <div className="-mx-5 overflow-x-auto px-5 pb-1">
+          <TabsList className="h-11 rounded-full bg-secondary/70 p-1">
+            {TABS.map(([value, label]) => (
+              <TabsTrigger key={value} value={value} className="rounded-full px-4 data-[state=active]:bg-aurora data-[state=active]:text-primary-foreground">
+                {label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </div>
+        <TabsContent value="overview" className="mt-8"><AdminOverview onOpen={open} /></TabsContent>
+        <TabsContent value="verifications" className="mt-2"><Verifications /></TabsContent>
+        <TabsContent value="members" className="mt-8"><AdminMembers /></TabsContent>
+        <TabsContent value="archive" className="mt-8"><AdminArchive /></TabsContent>
+        <TabsContent value="reports" className="mt-8"><AdminReports /></TabsContent>
+        <TabsContent value="security" className="mt-8"><AdminSecurityLog /></TabsContent>
+      </Tabs>
+    </div>
+  );
 }
 
 function Verifications() {
@@ -48,14 +97,12 @@ function Verifications() {
   const pending = reports.filter((r) => r.status === "pending");
   const reviewed = reports.filter((r) => r.status !== "pending");
   return (
-    <div className="mx-auto max-w-5xl px-5 py-12">
-      <p className="eyebrow">Admin</p>
-      <h1 className="mt-3 text-4xl font-semibold md:text-5xl">Death verifications</h1>
-      <p className="mt-3 max-w-xl text-muted-foreground">
+    <div>
+      <p className="mt-6 max-w-xl text-muted-foreground">
         Check each proof carefully. Approving turns the profile black, gives it the next archive number and opens its
         legacy memories in the Memory Archive.
       </p>
-      <h2 className="mt-10 text-2xl font-semibold">Waiting for review ({pending.length})</h2>
+      <h2 className="mt-8 text-2xl font-semibold">Waiting for review ({pending.length})</h2>
       {isLoading ? (
         <Loader2 className="mt-6 animate-spin text-muted-foreground" />
       ) : pending.length === 0 ? (
@@ -110,6 +157,7 @@ function PendingReport({ report: r }: { report: Tables<"death_reports"> }) {
     toast.success(approve ? `${r.subject_full_name} has been added to the Memory Archive.` : "Report rejected.");
     await Promise.all([
       qc.invalidateQueries({ queryKey: ["admin-death-reports"] }),
+      qc.invalidateQueries({ queryKey: ["admin"] }),
       qc.invalidateQueries({ queryKey: ["archive"] }),
     ]);
   }

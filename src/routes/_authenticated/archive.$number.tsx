@@ -84,7 +84,7 @@ function ArchivedProfile() {
       ) : (
         <div className="mt-6 columns-1 gap-4 space-y-4 sm:columns-2 lg:columns-3">
           {memories.map((m) => (
-            <MemoryCard key={m.id} memory={m} url={m.media_path ? urls?.[m.media_path] : undefined} showPrivacy />
+            <MemoryCard key={m.id} memory={m} url={m.media_path ? urls?.[m.media_path] : undefined} showPrivacy reportable />
           ))}
         </div>
       )}

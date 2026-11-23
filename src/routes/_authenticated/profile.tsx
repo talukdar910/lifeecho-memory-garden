@@ -12,7 +12,7 @@ import { StatusBadge } from "@/components/lifeecho/status-badge";
 import { LegacyContacts } from "@/components/lifeecho/legacy-contacts";
 import { supabase } from "@/integrations/supabase/client";
 import { legacyContactsQuery, profileQuery, removeMedia, uploadFile, useMediaUrls } from "@/lib/archive";
-import { COUNTRIES } from "@/lib/locales";
+import { COUNTRIES, LANGUAGES } from "@/lib/locales";
 import { MAX_UPLOAD_BYTES, validateBirthDate } from "@/lib/memory-rules";
 
 export const Route = createFileRoute("/_authenticated/profile")({
@@ -48,6 +48,7 @@ function ProfilePage() {
   const [dob, setDob] = useState(p?.date_of_birth ?? "");
   const [country, setCountry] = useState(p?.country ?? "");
   const [bio, setBio] = useState(p?.bio ?? "");
+  const [language, setLanguage] = useState(p?.preferred_language ?? "en");
   const [avatar, setAvatar] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
   const { data: urls } = useMediaUrls([p?.avatar_url]);
@@ -70,7 +71,14 @@ function ProfilePage() {
       }
       const { error } = await supabase
         .from("profiles")
-        .update({ full_name: fullName.trim(), date_of_birth: dob, country, bio: bio.trim() || null, avatar_url })
+        .update({
+          full_name: fullName.trim(),
+          date_of_birth: dob,
+          country,
+          bio: bio.trim() || null,
+          avatar_url,
+          preferred_language: language,
+        })
         .eq("id", me.userId);
       if (error) throw error;
       setAvatar(null);
@@ -147,6 +155,22 @@ function ProfilePage() {
               </SelectContent>
             </Select>
           </div>
+        </div>
+        <div className="grid gap-2">
+          <Label>Reading language</Label>
+          <Select value={language} onValueChange={setLanguage}>
+            <SelectTrigger className="h-11" aria-label="Reading language">
+              <SelectValue placeholder="Choose language" />
+            </SelectTrigger>
+            <SelectContent className="max-h-72">
+              {LANGUAGES.map((l) => (
+                <SelectItem key={l.code} value={l.code}>
+                  {l.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <p className="text-xs text-muted-foreground">Memories from other members can be translated into this language with AI.</p>
         </div>
         <div className="grid gap-2">
           <Label htmlFor="p-bio">A few words about you (optional)</Label>

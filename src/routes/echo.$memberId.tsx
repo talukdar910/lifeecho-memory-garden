@@ -76,9 +76,19 @@ function PublicEcho() {
       {m.bio && <p className="mt-8 max-w-3xl text-lg leading-relaxed whitespace-pre-line">{m.bio}</p>}
       <div className="mt-12 columns-1 gap-4 space-y-4 sm:columns-2 lg:columns-3">
         {memories.map((x) => (
-          <MemoryCard key={x.id} memory={x} url={x.media_path ? urls?.[x.media_path] : undefined} />
+          <MemoryCard
+            key={x.id}
+            memory={x}
+            url={x.media_path ? urls?.[x.media_path] : undefined}
+            reportable={!!user && user.id !== m.id}
+          />
         ))}
       </div>
+      {!user && memories.length > 0 && (
+        <p className="mt-8 text-center text-sm text-muted-foreground">
+          <Link to="/auth" className="text-primary hover:underline">Sign in</Link> to read these memories in your own language.
+        </p>
+      )}
       {!user && (
         <div className="glass-panel mt-16 rounded-3xl px-6 py-10 text-center">
           <h2 className="text-3xl font-semibold">Your Life. Your Emotions. Your Legacy.</h2>
