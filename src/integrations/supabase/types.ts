@@ -354,6 +354,64 @@ export type Database = {
           },
         ]
       }
+      memory_comments: {
+        Row: {
+          author_id: string
+          body: string
+          created_at: string
+          id: string
+          memory_id: string
+        }
+        Insert: {
+          author_id?: string
+          body: string
+          created_at?: string
+          id?: string
+          memory_id: string
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          created_at?: string
+          id?: string
+          memory_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "memory_comments_memory_id_fkey"
+            columns: ["memory_id"]
+            isOneToOne: false
+            referencedRelation: "life_memories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      memory_likes: {
+        Row: {
+          created_at: string
+          memory_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          memory_id: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          memory_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "memory_likes_memory_id_fkey"
+            columns: ["memory_id"]
+            isOneToOne: false
+            referencedRelation: "life_memories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       memory_translations: {
         Row: {
           body: string | null
@@ -471,6 +529,26 @@ export type Database = {
         Returns: undefined
       }
       can_view_media: { Args: { _path: string }; Returns: boolean }
+      community_feed: {
+        Args: { _before?: string; _limit?: number }
+        Returns: {
+          author_avatar: string
+          author_country: string
+          author_name: string
+          body: string
+          comment_count: number
+          created_at: string
+          emotion: string
+          id: string
+          kind: string
+          like_count: number
+          liked_by_me: boolean
+          media_path: string
+          memory_date: string
+          owner_id: string
+          title: string
+        }[]
+      }
       has_public_memories: { Args: { _owner: string }; Returns: boolean }
       has_role: {
         Args: {
@@ -481,7 +559,19 @@ export type Database = {
       }
       is_active_member: { Args: { _user_id: string }; Returns: boolean }
       is_legacy_contact: { Args: { _owner: string }; Returns: boolean }
+      is_public_memory: { Args: { _id: string }; Returns: boolean }
       is_verified_archived: { Args: { _person: string }; Returns: boolean }
+      memory_comment_list: {
+        Args: { _memory: string }
+        Returns: {
+          author_avatar: string
+          author_id: string
+          author_name: string
+          body: string
+          created_at: string
+          id: string
+        }[]
+      }
       my_death_reports: {
         Args: never
         Returns: {

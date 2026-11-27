@@ -2,7 +2,6 @@ import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-ro
 import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { ArrowRight, Eye, EyeOff, Loader2, Lock, Mail, MailCheck } from "lucide-react";
-import { LovableMark } from "@lovable.dev/cloud-auth-js/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,7 +17,16 @@ import { armIntro, playIntro } from "@/lib/intro";
 type Mode = "signin" | "signup" | "forgot";
 
 function safePath(p?: string) {
-  return p && p.startsWith("/") && !p.startsWith("//") ? p : "/dashboard";
+  if (!p) return "/dashboard";
+  try {
+    // Accept full same-origin URLs too, and never send the user back to the sign-in page itself.
+    const u = new URL(p, "http://x");
+    const path = u.pathname + u.search + u.hash;
+    if (!path.startsWith("/") || path.startsWith("//") || u.pathname.startsWith("/auth")) return "/dashboard";
+    return p.startsWith("http") ? path : p.startsWith("/") ? path : "/dashboard";
+  } catch {
+    return "/dashboard";
+  }
 }
 
 export const Route = createFileRoute("/auth")({
@@ -30,8 +38,17 @@ export const Route = createFileRoute("/auth")({
   }),
   ssr: false,
   beforeLoad: async ({ search }) => {
-    const { data } = await supabase.auth.getSession();
-    if (data.session) throw redirect({ to: safePath(search.redirect) });
+    // Only bounce away when the session is really valid; a stale stored token would otherwise
+    // ping-pong between here and the members area.
+    const { data: session } = await supabase.auth.getSession();
+    if (!session.session) return;
+    const { data, error } = await supabase.auth.getUser();
+    if (error || !data.user) {
+      await supabase.auth.signOut({ scope: "local" });
+      return;
+    }
+    const target = safePath(search.redirect);
+    throw redirect({ to: target.startsWith("/auth") ? "/dashboard" : target });
   },
   head: () => ({
     meta: [
@@ -114,7 +131,7 @@ function AuthPage() {
     }
   }
 
-  async function social(provider: "google" | "lovable") {
+  async function social(provider: "google") {
     armIntro();
     const result = await lovable.auth.signInWithOAuth(provider, { redirect_uri: window.location.origin + "/auth" });
     if (result.error) {
@@ -271,14 +288,9 @@ function AuthPage() {
               <div className="flex items-center gap-3 text-xs text-muted-foreground">
                 <span className="h-px flex-1 bg-border" /> or continue with <span className="h-px flex-1 bg-border" />
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                <Button type="button" variant="google" className="h-11 rounded-full" onClick={() => social("google")}>
+                <Button type="button" variant="google" className="h-11 w-full rounded-full" onClick={() => social("google")}>
                   <GoogleLogo /> Google
                 </Button>
-                <Button type="button" variant="outline" className="h-11 rounded-full bg-transparent" onClick={() => social("lovable")}>
-                  <LovableMark className="!size-[18px]" /> Lovable
-                </Button>
-              </div>
             </div>
           )}
 

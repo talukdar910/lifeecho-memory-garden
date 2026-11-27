@@ -53,7 +53,6 @@ function ArchivePage() {
               <div className="min-w-0">
                 <p className="text-xs font-semibold tracking-wider text-primary uppercase">
                   {formatProfileNumber(e.profile_number)}
-                  {e.is_demo && <span className="ml-2 text-muted-foreground normal-case">· Demo</span>}
                 </p>
                 <h2 className="truncate text-2xl font-semibold">{e.full_name}</h2>
                 <p className="text-sm text-muted-foreground">

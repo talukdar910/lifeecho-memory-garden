@@ -67,7 +67,6 @@ function ArchivedProfile() {
         <div>
           <p className="text-sm font-semibold tracking-wider text-primary uppercase">
             {formatProfileNumber(e.profile_number)}
-            {e.is_demo && <span className="ml-2 text-muted-foreground normal-case">· Demo profile</span>}
           </p>
           <h1 className="mt-2 text-5xl font-semibold">{e.full_name}</h1>
           <div className="mt-3 flex flex-wrap items-center gap-3 text-muted-foreground">

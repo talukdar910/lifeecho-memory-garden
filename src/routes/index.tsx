@@ -124,7 +124,7 @@ function Index() {
         <p className="eyebrow">How it works</p>
         <div className="mt-10 grid gap-10 md:grid-cols-3">
           {[
-            ["01", "Create your account", "Join LifeEcho in under a minute with email, Google or Lovable."],
+            ["01", "Create your account", "Join LifeEcho in under a minute with email or Google."],
             ["02", "Capture your memories", "Stories, experiences, thoughts, photos, videos and audio — each with its emotion."],
             ["03", "Choose your legacy", "Keep it private, leave it to the people you trust, or share it openly."],
           ].map(([n, t, d]) => (
