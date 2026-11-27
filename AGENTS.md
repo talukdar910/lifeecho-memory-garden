@@ -42,3 +42,7 @@ use the editor.
 - AI translation runs only in `translateMemory` (`src/lib/translate.functions.ts`, signed-in readers); it re-reads the memory under the reader's RLS before calling Lovable AI and caches results in `memory_translations` (server-only table); why: never translate what the reader can't see, and never pay twice.
 - Admin panel data comes from `src/lib/admin.ts` via admin-only RLS policies, and admin writes go through security-definer RPCs that log to `audit_log`; why: the security log stays complete.
 - The post-sign-in opening plays from `OpeningIntro` in `__root` via `playIntro()` / `armIntro()` (`src/lib/intro.ts`); why: one overlay works for email and redirecting OAuth sign-ins.
+
+- Community feed and comment lists come from security-definer RPCs `community_feed` / `memory_comment_list` (Public, non-hidden memories of non-archived members only); likes/comments tables are RLS-gated by `is_public_memory`; why: author names without exposing profiles.
+- The `/auth` guard validates with `getUser()` and clears stale local sessions before redirecting; why: a stale stored token caused a sign-in redirect loop.
+- Archive pages use the `memorial` utilities in `styles.css`; `is_demo` stays internal (admin only), never shown to members.

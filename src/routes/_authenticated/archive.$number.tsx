@@ -53,59 +53,68 @@ function ArchivedProfile() {
   const prev = idx > 0 ? list[idx - 1] : undefined;
   const next = idx >= 0 && idx < list.length - 1 ? list[idx + 1] : undefined;
 
+  const initials = e.full_name.split(" ").filter(Boolean).slice(0, 2).map((w) => w.charAt(0)).join("");
+
   return (
-    <div className="mx-auto max-w-6xl px-5 py-12">
-      <Link to="/archive" className="text-sm text-muted-foreground hover:text-foreground">
-        ← Memory Archive
-      </Link>
-      <section className="mt-6 flex flex-col gap-6 md:flex-row md:items-center">
-        <div className="size-32 shrink-0 overflow-hidden rounded-full bg-muted">
-          {e.avatar_path && urls?.[e.avatar_path] && (
-            <img src={urls[e.avatar_path]} alt={e.full_name} className="size-full object-cover" />
-          )}
-        </div>
-        <div>
-          <p className="text-sm font-semibold tracking-wider text-primary uppercase">
-            {formatProfileNumber(e.profile_number)}
-          </p>
-          <h1 className="mt-2 text-5xl font-semibold">{e.full_name}</h1>
-          <div className="mt-3 flex flex-wrap items-center gap-3 text-muted-foreground">
-            <StatusBadge status="deceased" />
-            <span>{[lifespan(e.date_of_birth, e.date_of_death), countryName(e.country)].filter(Boolean).join(" · ")}</span>
+    <div className="memorial min-h-screen">
+      <div className="mx-auto max-w-5xl px-5 py-10 md:py-14">
+        <Link to="/archive" className="text-sm text-memorial-muted hover:text-memorial-foreground">
+          ← Memory Archive
+        </Link>
+        <section className="mt-8 flex flex-col items-center text-center">
+          <div className="flex size-36 shrink-0 items-center justify-center overflow-hidden rounded-full border border-memorial-gold/50 bg-memorial text-4xl text-memorial-gold grayscale">
+            {e.avatar_path && urls?.[e.avatar_path] ? (
+              <img src={urls[e.avatar_path]} alt={e.full_name} className="size-full object-cover" />
+            ) : (
+              initials
+            )}
           </div>
-        </div>
-      </section>
-      {e.biography && <p className="mt-8 max-w-3xl text-lg leading-relaxed whitespace-pre-line">{e.biography}</p>}
+          <p className="mt-6 text-xs tracking-[0.4em] text-memorial-gold uppercase">
+            In loving memory · {formatProfileNumber(e.profile_number)}
+          </p>
+          <h1 className="mt-3 text-4xl font-medium md:text-6xl">{e.full_name}</h1>
+          <p className="mt-3 text-lg text-memorial-muted italic">
+            {[lifespan(e.date_of_birth, e.date_of_death), countryName(e.country)].filter(Boolean).join(" · ")}
+          </p>
+          <div className="mt-4"><StatusBadge status="deceased" /></div>
+          <div className="memorial-rule mt-8 w-48" />
+          {e.biography && (
+            <p className="mt-8 max-w-2xl text-xl leading-relaxed whitespace-pre-line">{e.biography}</p>
+          )}
+        </section>
 
-      <h2 className="mt-14 text-3xl font-semibold">Their legacy</h2>
-      {memories.length === 0 ? (
-        <p className="mt-4 text-muted-foreground">No memories are shared with you here. Legacy memories are visible only to the contacts this member chose.</p>
-      ) : (
-        <div className="mt-6 columns-1 gap-4 space-y-4 sm:columns-2 lg:columns-3">
-          {memories.map((m) => (
-            <MemoryCard key={m.id} memory={m} url={m.media_path ? urls?.[m.media_path] : undefined} showPrivacy reportable />
-          ))}
-        </div>
-      )}
-
-      <nav className="mt-16 flex justify-between gap-3 border-t border-border pt-6">
-        {prev ? (
-          <Button asChild variant="glass">
-            <Link to="/archive/$number" params={{ number: profileSlug(prev.profile_number) }}>
-              <ArrowLeft /> Visit Previous Profile
-            </Link>
-          </Button>
+        <h2 className="mt-16 text-center text-3xl font-medium">Their legacy</h2>
+        {memories.length === 0 ? (
+          <p className="mt-4 text-center text-memorial-muted italic">
+            No memories are shared with you here. Legacy memories are visible only to the contacts this member chose.
+          </p>
         ) : (
-          <span />
+          <div className="mt-8 columns-1 gap-4 space-y-4 sm:columns-2">
+            {memories.map((m) => (
+              <MemoryCard key={m.id} memory={m} url={m.media_path ? urls?.[m.media_path] : undefined} showPrivacy reportable />
+            ))}
+          </div>
         )}
-        {next && (
-          <Button asChild variant="glass">
-            <Link to="/archive/$number" params={{ number: profileSlug(next.profile_number) }}>
-              Next Profile <ArrowRight />
-            </Link>
-          </Button>
-        )}
-      </nav>
+
+        <nav className="mt-16 flex flex-wrap justify-between gap-3 border-t border-memorial-line pt-6">
+          {prev ? (
+            <Button asChild variant="ghost">
+              <Link to="/archive/$number" params={{ number: profileSlug(prev.profile_number) }}>
+                <ArrowLeft /> Visit Previous Profile
+              </Link>
+            </Button>
+          ) : (
+            <span />
+          )}
+          {next && (
+            <Button asChild variant="ghost">
+              <Link to="/archive/$number" params={{ number: profileSlug(next.profile_number) }}>
+                Next Profile <ArrowRight />
+              </Link>
+            </Button>
+          )}
+        </nav>
+      </div>
     </div>
   );
 }

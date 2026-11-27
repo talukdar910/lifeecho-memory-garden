@@ -263,3 +263,12 @@ export const AUDIT_ACTION_LABEL: Record<string, string> = {
 export function auditLabel(action: string): string {
   return AUDIT_ACTION_LABEL[action] ?? action;
 }
+
+/** Community comments: 1–1000 characters after trimming. */
+export const MAX_COMMENT_LENGTH = 1000;
+export function validateComment(body: string): string | null {
+  const t = body.trim();
+  if (!t) return "Write something first.";
+  if (t.length > MAX_COMMENT_LENGTH) return `Comments can be up to ${MAX_COMMENT_LENGTH} characters.`;
+  return null;
+}

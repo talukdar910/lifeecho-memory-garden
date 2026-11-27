@@ -17,6 +17,7 @@ import { AuthProvider } from "@/lib/auth-context";
 import { SiteHeader } from "@/components/lifeecho/site-header";
 import { SiteFooter } from "@/components/lifeecho/site-footer";
 import { OpeningIntro } from "@/components/lifeecho/opening-intro";
+import { MobileTabBar } from "@/components/lifeecho/mobile-tab-bar";
 
 function NotFoundComponent() {
   return (
@@ -83,7 +84,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     // Never add og:image or twitter:image here: every page without its own would inherit it.
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
+      { name: "apple-mobile-web-app-title", content: "LifeEcho" },
       { title: "LifeEcho — Your Life. Your Emotions. Your Legacy." },
       {
         name: "description",
@@ -112,6 +117,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { rel: "icon", href: "/favicon.png", type: "image/png" },
       { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
+      { rel: "manifest", href: "/manifest.webmanifest" },
     ],
   }),
   shellComponent: RootShell,
@@ -142,12 +148,13 @@ function RootComponent() {
       <AuthProvider>
         <div className="flex min-h-screen flex-col">
           <SiteHeader />
-          <main className="flex-1">
+          <main className="flex-1 pb-safe md:pb-0">
             {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
             <Outlet />
           </main>
           <SiteFooter />
         </div>
+        <MobileTabBar />
         <Toaster theme="dark" position="top-center" />
         <OpeningIntro />
       </AuthProvider>

@@ -12,4 +12,9 @@
 - [x] Demo profiles (fictional)
 - [x] AI translation of memories into the reader's language
 - [x] GitHub: code syncs automatically to the connected repository after each change
+- [x] Phone app: installable to home screen, bottom tab bar, Lovable branding removed
+- [x] Community: feed of Public memories, likes, comments
+- [x] Memorial serif style for the archive
+- [x] Sign-in redirect loop fix
+- [x] 100 archive profiles, no visible demo labels
 - [ ] Later: full interface translation, mobile apps, AI-assisted search

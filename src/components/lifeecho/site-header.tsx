@@ -10,6 +10,7 @@ import { Logo } from "./logo";
 
 const memberLinks = [
   { to: "/dashboard", label: "Dashboard" },
+  { to: "/community", label: "Community" },
   { to: "/archive", label: "Memory Archive" },
   { to: "/verify", label: "Report a passing" },
   { to: "/profile", label: "Profile" },
@@ -23,7 +24,7 @@ export function SiteHeader() {
   const links = user && isAdmin ? [...memberLinks, { to: "/admin", label: "Admin" } as const] : memberLinks;
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border/60 bg-background/70 backdrop-blur-xl">
+    <header style={{ paddingTop: "env(safe-area-inset-top)" }} className="sticky top-0 z-40 border-b border-border/60 bg-background/70 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5">
         <Logo />
 

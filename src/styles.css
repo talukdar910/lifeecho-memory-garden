@@ -336,3 +336,38 @@
 @media (prefers-reduced-motion: reduce) {
   .orb { animation: none; }
 }
+
+/* ---------- Memorial archive: timeless, dignified ---------- */
+:root {
+  --memorial: oklch(0.11 0.004 80);
+  --memorial-foreground: oklch(0.93 0.018 85);
+  --memorial-muted: oklch(0.7 0.02 80);
+  --memorial-gold: oklch(0.8 0.07 85);
+  --memorial-line: oklch(0.8 0.07 85 / 22%);
+}
+@theme inline {
+  --color-memorial: var(--memorial);
+  --color-memorial-foreground: var(--memorial-foreground);
+  --color-memorial-muted: var(--memorial-muted);
+  --color-memorial-gold: var(--memorial-gold);
+  --color-memorial-line: var(--memorial-line);
+}
+@utility memorial {
+  font-family: var(--font-display);
+  color: var(--memorial-foreground);
+  background: radial-gradient(70% 45% at 50% 0%, oklch(0.22 0.02 85 / 45%), transparent 70%), var(--memorial);
+  & p, & span, & a, & li { font-family: var(--font-display); }
+}
+@utility memorial-card {
+  border: 1px solid var(--memorial-line);
+  background: oklch(0.14 0.006 80 / 80%);
+}
+@utility memorial-rule {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--memorial-gold), transparent);
+}
+
+/* Mobile app shell */
+@utility pb-safe {
+  padding-bottom: calc(env(safe-area-inset-bottom) + 4.5rem);
+}

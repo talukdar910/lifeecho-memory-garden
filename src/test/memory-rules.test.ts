@@ -108,3 +108,12 @@ describe("LifeEcho rules", () => {
     expect(validateLegacyContact("sam@example.com", "me@example.com", ["sam@example.com"])).not.toBeNull();
   });
 });
+
+import { validateComment as _validateComment } from "@/lib/memory-rules";
+describe("community comments", () => {
+  it("rejects empty comments", () => expect(_validateComment("   ")).not.toBeNull());
+  it("accepts 1000 characters and rejects 1001", () => {
+    expect(_validateComment("a".repeat(1000))).toBeNull();
+    expect(_validateComment("a".repeat(1001))).not.toBeNull();
+  });
+});
