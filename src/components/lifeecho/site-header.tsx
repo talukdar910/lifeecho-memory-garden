@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useAuth, useSignOut } from "@/lib/auth-context";
 import { Logo } from "./logo";
+import { InstallApp, useInstallApp } from "./install-app";
 
 const memberLinks = [
   { to: "/community", label: "Community" },
@@ -20,6 +21,7 @@ export function SiteHeader() {
   const { user, ready } = useAuth();
   const signOut = useSignOut();
   const [open, setOpen] = useState(false);
+  const installState = useInstallApp();
   const { data: isAdmin } = useQuery({ ...isAdminQuery(), enabled: !!user });
   const links = user && isAdmin ? [...memberLinks, { to: "/admin", label: "Admin" } as const] : memberLinks;
 
@@ -43,6 +45,7 @@ export function SiteHeader() {
         </nav>
 
         <div className="hidden items-center gap-2 md:flex">
+          <InstallApp state={installState} showGuide />
           {ready && !user && (
             <>
               <Button asChild variant="ghost">
@@ -70,6 +73,7 @@ export function SiteHeader() {
           </SheetTrigger>
           <SheetContent side="right" className="w-72 bg-background">
             <SheetTitle className="font-display text-2xl">Menu</SheetTitle>
+            <div className="mt-6"><InstallApp state={installState} /></div>
             <div className="mt-8 flex flex-col gap-2" onClick={() => setOpen(false)}>
               {user ? (
                 <>

@@ -48,3 +48,4 @@ use the editor.
 - Archive pages use the `memorial` utilities in `styles.css`; `is_demo` stays internal (admin only), never shown to members.
 - Default sign-in destinations use `signInDestination`; explicit internal return paths are preserved, while normal sign-in and profile completion open Community to keep the living-member experience social.
 - `ArchiveSpotlight` connects Community and personal memories to the Archive; memorial stone surfaces use the shared CDN asset pointer and semantic memorial tokens so all entry points stay visually consistent.
+- Home-screen support is manifest-only with browser installation prompts and platform guidance in `InstallApp`; do not register an app-shell service worker because offline caching was not requested and can break previews.

@@ -3,6 +3,8 @@
   "short_name": "LifeEcho",
   "description": "Your Life. Your Emotions. Your Legacy.",
   "start_url": "/dashboard",
+  "scope": "/",
+  "lang": "en",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0b1413",
@@ -10,6 +12,6 @@
   "icons": [
     { "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" },
     { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
   ]
 }
