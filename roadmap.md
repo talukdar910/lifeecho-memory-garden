@@ -1,4 +1,7 @@
 # LifeEcho roadmap
+- [x] Community-first sign-in with posting and prominent Archive access
+- [x] Engaging Archive directory and marble-and-gold memorial profiles
+- [x] Verify signed-in navigation and mobile memorial design
 - [x] New slogan + Tree of life logo + favicon
 - [x] Registration: full name, email, password, date of birth, country; profile picture required at first sign-in
 - [x] Active profile: green = alive & active, black = deceased/archived

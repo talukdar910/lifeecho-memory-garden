@@ -2,11 +2,13 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useMutation, useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
 import { formatDistanceToNow } from "date-fns";
-import { Heart, Loader2, MessageCircle, Send, Trash2 } from "lucide-react";
+import { BookOpen, Heart, Loader2, MessageCircle, Send, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { MemoryCard } from "@/components/lifeecho/memory-card";
+import { AddMemoryDialog } from "@/components/lifeecho/add-memory-dialog";
+import { ArchiveSpotlight } from "@/components/lifeecho/archive-spotlight";
 import { supabase } from "@/integrations/supabase/client";
 import { ensureCompleteProfile, profileQuery, useMediaUrls } from "@/lib/archive";
 import { countryName } from "@/lib/locales";
@@ -63,12 +65,18 @@ function CommunityPage() {
   const { data: urls } = useMediaUrls(posts.flatMap((p) => [p.media_path, p.author_avatar]));
 
   return (
+    <>
+    <ArchiveSpotlight />
     <div className="mx-auto max-w-2xl px-4 py-10">
-      <p className="eyebrow">Community</p>
-      <h1 className="mt-3 text-4xl font-semibold md:text-5xl">Shared lives</h1>
-      <p className="mt-3 text-muted-foreground">
-        Memories members chose to share with everyone. Mark any of yours as Public on your dashboard to join in.
-      </p>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div><p className="eyebrow">The living community</p>
+        <h1 className="mt-2 text-4xl font-semibold md:text-5xl">Shared lives</h1></div>
+        <AddMemoryDialog />
+      </div>
+      <div className="mt-6 flex items-center justify-between gap-3 border-y border-border py-3">
+        <span className="text-sm font-semibold text-primary">Community feed</span>
+        <Button asChild variant="ghost" size="sm"><Link to="/dashboard"><BookOpen /> My memories</Link></Button>
+      </div>
       {posts.length === 0 ? (
         <div className="glass-panel mt-10 rounded-2xl p-8 text-center">
           <p className="text-muted-foreground">Nothing shared yet. Be the first to post a Public memory.</p>
@@ -98,6 +106,7 @@ function CommunityPage() {
         </div>
       )}
     </div>
+    </>
   );
 }
 
@@ -147,7 +156,8 @@ function Comments({ memoryId }: { memoryId: string }) {
     mutationFn: async () => {
       const invalid = validateComment(body);
       if (invalid) throw new Error(invalid);
-      const { error } = await supabase.from("memory_comments").insert({ memory_id: memoryId, body: body.trim(), author_id: me!.userId });
+      if (!me) throw new Error("Please sign in again.");
+      const { error } = await supabase.from("memory_comments").insert({ memory_id: memoryId, body: body.trim(), author_id: me.userId });
       if (error) throw error;
     },
     onSuccess: () => {

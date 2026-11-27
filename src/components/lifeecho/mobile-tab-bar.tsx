@@ -1,11 +1,11 @@
 import { Link } from "@tanstack/react-router";
-import { Home, Landmark, User, Users } from "lucide-react";
+import { BookOpen, Landmark, User, Users } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 
 const tabs = [
-  { to: "/dashboard", label: "Home", icon: Home },
   { to: "/community", label: "Community", icon: Users },
-  { to: "/archive", label: "Archive", icon: Landmark },
+  { to: "/archive", label: "Memory Archive", icon: Landmark },
+  { to: "/dashboard", label: "My memories", icon: BookOpen },
   { to: "/profile", label: "Profile", icon: User },
 ] as const;
 
@@ -24,7 +24,7 @@ export function MobileTabBar() {
           <Link
             key={to}
             to={to}
-            className="flex flex-col items-center gap-1 py-2.5 text-[0.68rem] font-medium text-muted-foreground"
+            className={`flex flex-col items-center gap-1 py-2.5 text-[0.68rem] font-medium ${to === "/archive" ? "text-memorial-gold" : "text-muted-foreground"}`}
             activeProps={{ className: "text-primary" }}
           >
             <Icon className="size-5" />

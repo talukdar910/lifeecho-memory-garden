@@ -13,21 +13,9 @@ import { lovable } from "@/integrations/lovable";
 import { LogoMark } from "@/components/lifeecho/logo";
 import { Particles } from "@/components/lifeecho/particles";
 import { armIntro, playIntro } from "@/lib/intro";
+import { signInDestination } from "@/lib/sign-in-destination";
 
 type Mode = "signin" | "signup" | "forgot";
-
-function safePath(p?: string) {
-  if (!p) return "/dashboard";
-  try {
-    // Accept full same-origin URLs too, and never send the user back to the sign-in page itself.
-    const u = new URL(p, "http://x");
-    const path = u.pathname + u.search + u.hash;
-    if (!path.startsWith("/") || path.startsWith("//") || u.pathname.startsWith("/auth")) return "/dashboard";
-    return p.startsWith("http") ? path : p.startsWith("/") ? path : "/dashboard";
-  } catch {
-    return "/dashboard";
-  }
-}
 
 export const Route = createFileRoute("/auth")({
   validateSearch: (
@@ -47,8 +35,8 @@ export const Route = createFileRoute("/auth")({
       await supabase.auth.signOut({ scope: "local" });
       return;
     }
-    const target = safePath(search.redirect);
-    throw redirect({ to: target.startsWith("/auth") ? "/dashboard" : target });
+    const target = signInDestination(search.redirect);
+    throw redirect({ to: target });
   },
   head: () => ({
     meta: [
@@ -86,7 +74,7 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const target = safePath(search.redirect);
+  const target = signInDestination(search.redirect);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();

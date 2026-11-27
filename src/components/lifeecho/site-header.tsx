@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Menu, LogOut } from "lucide-react";
+import { Landmark, Menu, LogOut } from "lucide-react";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { isAdminQuery } from "@/lib/archive";
@@ -9,9 +9,9 @@ import { useAuth, useSignOut } from "@/lib/auth-context";
 import { Logo } from "./logo";
 
 const memberLinks = [
-  { to: "/dashboard", label: "Dashboard" },
   { to: "/community", label: "Community" },
   { to: "/archive", label: "Memory Archive" },
+  { to: "/dashboard", label: "My memories" },
   { to: "/verify", label: "Report a passing" },
   { to: "/profile", label: "Profile" },
 ] as const;
@@ -34,10 +34,10 @@ export function SiteHeader() {
               <Link
                 key={l.to}
                 to={l.to}
-                className="rounded-full px-4 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                className={`inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors hover:text-foreground ${l.to === "/archive" ? "border border-memorial-line text-memorial-gold" : "text-muted-foreground"}`}
                 activeProps={{ className: "bg-secondary text-foreground" }}
               >
-                {l.label}
+                {l.to === "/archive" && <Landmark className="size-4" />}{l.label}
               </Link>
             ))}
         </nav>

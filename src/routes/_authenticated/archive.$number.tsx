@@ -1,10 +1,11 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, Sprout } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MemoryCard } from "@/components/lifeecho/memory-card";
 import { StatusBadge } from "@/components/lifeecho/status-badge";
-import { archiveEntryQuery, ensureCompleteProfile, archiveListQuery, legacyMemoriesQuery, useMediaUrls } from "@/lib/archive";
+import { archiveEntryQuery, ensureCompleteProfile, archiveListQuery, legacyMemoriesQuery, useMediaUrls, type ArchiveEntry } from "@/lib/archive";
+import marble from "@/assets/memorial-marble.asset.json";
 import { countryName } from "@/lib/locales";
 import { formatProfileNumber, lifespan, parseProfileSlug, profileSlug } from "@/lib/memory-rules";
 
@@ -45,9 +46,13 @@ export const Route = createFileRoute("/_authenticated/archive/$number")({
 function ArchivedProfile() {
   const { n } = Route.useLoaderData();
   const { data: entry } = useSuspenseQuery(archiveEntryQuery(n));
+  if (!entry) return <div className="memorial p-10 text-center">This memorial is unavailable.</div>;
+  return <MemorialProfile entry={entry} />;
+}
+
+function MemorialProfile({ entry: e }: { entry: ArchiveEntry }) {
   const { data: list } = useSuspenseQuery(archiveListQuery());
-  const { data: memories } = useSuspenseQuery(legacyMemoriesQuery(entry!.person_id));
-  const e = entry!;
+  const { data: memories } = useSuspenseQuery(legacyMemoriesQuery(e.person_id));
   const { data: urls } = useMediaUrls([e.avatar_path, ...memories.map((m) => m.media_path)]);
   const idx = list.findIndex((x) => x.profile_number === e.profile_number);
   const prev = idx > 0 ? list[idx - 1] : undefined;
@@ -61,29 +66,37 @@ function ArchivedProfile() {
         <Link to="/archive" className="text-sm text-memorial-muted hover:text-memorial-foreground">
           ← Memory Archive
         </Link>
-        <section className="mt-8 flex flex-col items-center text-center">
-          <div className="flex size-36 shrink-0 items-center justify-center overflow-hidden rounded-full border border-memorial-gold/50 bg-memorial text-4xl text-memorial-gold grayscale">
+        <section className="mt-8 flex flex-col items-center text-center" aria-label="Memorial inscription">
+          <div className="memorial-stone relative isolate w-full max-w-xl overflow-hidden px-6 pt-12 pb-14 sm:px-12 sm:pt-16">
+          <img src={marble.url} alt="Polished dark marble with natural veins" className="absolute inset-0 -z-10 size-full object-cover" />
+          <div className="memorial-stone-inlay absolute inset-4 -z-10 sm:inset-6" />
+          <Sprout aria-hidden className="mx-auto mb-6 size-8 text-memorial-gold" strokeWidth={1} />
+          <p className="mb-7 text-lg text-memorial-gold italic">In loving memory</p>
+          <div className="mx-auto flex size-32 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-memorial-gold/50 bg-memorial text-4xl text-memorial-gold grayscale sm:size-36">
             {e.avatar_path && urls?.[e.avatar_path] ? (
               <img src={urls[e.avatar_path]} alt={e.full_name} className="size-full object-cover" />
             ) : (
               initials
             )}
           </div>
-          <p className="mt-6 text-xs tracking-[0.4em] text-memorial-gold uppercase">
-            In loving memory · {formatProfileNumber(e.profile_number)}
-          </p>
-          <h1 className="mt-3 text-4xl font-medium md:text-6xl">{e.full_name}</h1>
+          <h1 className="memorial-inscription mt-7 text-4xl leading-tight font-medium break-words sm:text-5xl">{e.full_name}</h1>
           <p className="mt-3 text-lg text-memorial-muted italic">
             {[lifespan(e.date_of_birth, e.date_of_death), countryName(e.country)].filter(Boolean).join(" · ")}
           </p>
-          <div className="mt-4"><StatusBadge status="deceased" /></div>
-          <div className="memorial-rule mt-8 w-48" />
+          <div className="memorial-rule mx-auto mt-7 w-36" />
+          <p className="mt-6 text-xl text-memorial-gold italic">Forever remembered</p>
+          <p className="mt-3 text-sm text-memorial-muted">{formatProfileNumber(e.profile_number)}</p>
+          </div>
+          <div aria-hidden className="memorial-plinth h-4 w-full max-w-[38rem]" />
+          <div className="mt-6"><StatusBadge status="deceased" /></div>
           {e.biography && (
             <p className="mt-8 max-w-2xl text-xl leading-relaxed whitespace-pre-line">{e.biography}</p>
           )}
         </section>
 
-        <h2 className="mt-16 text-center text-3xl font-medium">Their legacy</h2>
+        <div className="mt-14 text-center"><Sprout aria-hidden className="mx-auto size-5 text-memorial-gold" strokeWidth={1} />
+        <h2 className="mt-3 text-4xl font-medium">A life, in memories</h2>
+        <div className="memorial-rule mx-auto mt-4 w-24" /></div>
         {memories.length === 0 ? (
           <p className="mt-4 text-center text-memorial-muted italic">
             No memories are shared with you here. Legacy memories are visible only to the contacts this member chose.

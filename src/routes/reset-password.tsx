@@ -35,7 +35,7 @@ function ResetPassword() {
     setBusy(false);
     if (error) { toast.error(error.message); return; }
     toast.success("Your password has been updated.");
-    navigate({ to: "/dashboard" });
+    navigate({ to: "/community" });
   }
 
   return (

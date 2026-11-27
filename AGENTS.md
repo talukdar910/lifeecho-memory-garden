@@ -46,3 +46,5 @@ use the editor.
 - Community feed and comment lists come from security-definer RPCs `community_feed` / `memory_comment_list` (Public, non-hidden memories of non-archived members only); likes/comments tables are RLS-gated by `is_public_memory`; why: author names without exposing profiles.
 - The `/auth` guard validates with `getUser()` and clears stale local sessions before redirecting; why: a stale stored token caused a sign-in redirect loop.
 - Archive pages use the `memorial` utilities in `styles.css`; `is_demo` stays internal (admin only), never shown to members.
+- Default sign-in destinations use `signInDestination`; explicit internal return paths are preserved, while normal sign-in and profile completion open Community to keep the living-member experience social.
+- `ArchiveSpotlight` connects Community and personal memories to the Archive; memorial stone surfaces use the shared CDN asset pointer and semantic memorial tokens so all entry points stay visually consistent.

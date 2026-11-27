@@ -72,6 +72,7 @@ export function AddMemoryDialog() {
       if (error) throw error;
       toast.success("Memory preserved.");
       await qc.invalidateQueries({ queryKey: ["my-memories"] });
+      await qc.invalidateQueries({ queryKey: ["community-feed"] });
       reset();
       setOpen(false);
     } catch (e) {

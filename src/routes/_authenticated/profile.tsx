@@ -84,7 +84,7 @@ function ProfilePage() {
       setAvatar(null);
       toast.success(setup ? "Welcome to LifeEcho." : "Profile saved.");
       await qc.invalidateQueries({ queryKey: ["profile"] });
-      if (setup) navigate({ to: "/dashboard" });
+      if (setup) navigate({ to: "/community" });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not save your profile");
     } finally {

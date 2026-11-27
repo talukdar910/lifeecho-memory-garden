@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { AddMemoryDialog } from "@/components/lifeecho/add-memory-dialog";
 import { MemoryCard } from "@/components/lifeecho/memory-card";
 import { StatusBadge } from "@/components/lifeecho/status-badge";
+import { ArchiveSpotlight } from "@/components/lifeecho/archive-spotlight";
 import { supabase } from "@/integrations/supabase/client";
 import { ensureCompleteProfile, legacyContactsQuery, myMemoriesQuery, profileQuery, removeMedia, useMediaUrls } from "@/lib/archive";
 import {
@@ -87,6 +88,8 @@ function Dashboard() {
   }
 
   return (
+    <>
+    <ArchiveSpotlight />
     <div className="mx-auto max-w-6xl px-5 py-12">
       <section className="glass-panel flex flex-col gap-6 rounded-3xl p-6 md:flex-row md:items-center md:p-8">
         <div className="size-20 shrink-0 overflow-hidden rounded-full bg-aurora">
@@ -209,5 +212,6 @@ function Dashboard() {
         </div>
       )}
     </div>
+    </>
   );
 }
