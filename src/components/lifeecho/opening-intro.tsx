@@ -42,7 +42,7 @@ export function OpeningIntro() {
       key={run}
       role="status"
       aria-label="Opening LifeEcho"
-      className="intro-overlay pointer-events-auto fixed inset-0 z-[100] flex items-center justify-center overflow-hidden"
+      className="intro-overlay pointer-events-none fixed inset-0 z-[100] flex items-center justify-center overflow-hidden"
     >
       <div className="relative flex flex-col items-center px-6 text-center">
         <div className="relative flex size-[clamp(8rem,34vw,12rem)] items-center justify-center">
