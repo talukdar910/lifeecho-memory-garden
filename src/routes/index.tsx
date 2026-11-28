@@ -40,33 +40,33 @@ const promises = [
 
 function Index() {
   return (
-    <>
+    <div className="landing-reflective">
       {/* Hero */}
       <section className="relative isolate overflow-hidden">
         <img
           src={heroTree}
           alt="A glowing tree of life with points of light rising into the night sky"
-          className="absolute inset-0 -z-20 h-full w-full object-cover object-bottom opacity-80 md:object-[center_75%]"
+          className="absolute inset-0 -z-20 h-full w-full object-cover object-bottom opacity-60 md:object-[center_75%]"
         />
-        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-background/40 via-background/30 to-background" />
-        <Particles />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-background/60 via-background/50 to-background" />
+        <div className="pointer-events-none opacity-40"><Particles /></div>
         <div className="mx-auto flex min-h-[86vh] max-w-6xl flex-col justify-start px-5 pt-20 pb-24 md:justify-center md:pt-10">
           <p className="eyebrow animate-fade-up">A global digital memory platform</p>
           <h1 className="mt-5 max-w-3xl animate-fade-up text-5xl leading-[1.02] font-semibold md:text-7xl">
             Your Life. Your Emotions.{" "}
             <em className="text-aurora not-italic md:italic">Your Legacy.</em>
           </h1>
-          <p className="mt-6 max-w-xl animate-fade-up text-lg text-muted-foreground [animation-delay:120ms]">
+          <p className="landing-engraving mt-6 max-w-xl animate-fade-up text-2xl leading-relaxed text-muted-foreground [animation-delay:120ms]">
             Keep your stories, photos, videos and voice safe — private to you, passed on to the people you choose,
             or shared with the world. Every life leaves an echo.
           </p>
           <div className="mt-9 flex animate-fade-up flex-wrap gap-3 [animation-delay:220ms]">
-            <Button asChild variant="hero" size="xl">
+            <Button asChild variant="outline" size="xl" className="landing-engraving border-primary/40 bg-secondary text-xl text-foreground hover:bg-accent">
               <Link to="/auth" search={{ mode: "signup" }}>
                 Begin your LifeEcho <ArrowRight />
               </Link>
             </Button>
-            <Button asChild variant="glass" size="xl">
+            <Button asChild variant="outline" size="xl" className="landing-engraving text-xl text-muted-foreground">
               <Link to="/auth">Sign in</Link>
             </Button>
           </div>
@@ -145,6 +145,6 @@ function Index() {
           </Button>
         </div>
       </section>
-    </>
+    </div>
   );
 }
