@@ -1,4 +1,5 @@
 # LifeEcho roadmap
+- [x] Clear sign-in placeholders, soften Add memory, remove Community feed section and place My memories below Add memory
 - [x] Community-first sign-in with posting and prominent Archive access
 - [x] Engaging Archive directory and marble-and-gold memorial profiles
 - [x] Verify signed-in navigation and mobile memorial design

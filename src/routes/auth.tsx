@@ -194,7 +194,6 @@ function AuthPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   autoComplete="email"
-                  placeholder="you@example.com"
                   className="h-12 rounded-xl bg-background/40 pl-11 transition-shadow focus-visible:shadow-glow"
                 />
               </div>
@@ -223,7 +222,6 @@ function AuthPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     autoComplete={mode === "signup" ? "new-password" : "current-password"}
-                    placeholder="••••••••"
                     className="h-12 rounded-xl bg-background/40 pr-12 pl-11 transition-shadow focus-visible:shadow-glow"
                   />
                   <button

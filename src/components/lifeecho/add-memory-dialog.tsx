@@ -91,7 +91,7 @@ export function AddMemoryDialog() {
       }}
     >
       <DialogTrigger asChild>
-        <Button variant="hero" size="lg" className="rounded-full">
+        <Button variant="secondary" size="lg" className="h-11 rounded-lg border border-border px-5">
           <Plus /> Add memory
         </Button>
       </DialogTrigger>

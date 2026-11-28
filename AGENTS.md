@@ -49,3 +49,4 @@ use the editor.
 - Default sign-in destinations use `signInDestination`; explicit internal return paths are preserved, while normal sign-in and profile completion open Community to keep the living-member experience social.
 - `ArchiveSpotlight` connects Community and personal memories to the Archive; memorial stone surfaces use the shared CDN asset pointer and semantic memorial tokens so all entry points stay visually consistent.
 - Home-screen support is manifest-only with browser installation prompts and platform guidance in `InstallApp`; do not register an app-shell service worker because offline caching was not requested and can break previews.
+- Community renders Archive access and memory actions without a feed; keep My memories directly below Add memory while retaining existing backend social data for other consumers.
