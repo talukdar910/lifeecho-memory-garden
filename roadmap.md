@@ -1,4 +1,7 @@
 # LifeEcho roadmap
+- [x] Memorial timelines combining original memories and separate visitor contributions
+- [x] Add story, photo and video contributions with private-by-default visibility and owner controls
+- [x] Verify memorial creation and read-back on desktop and phone
 - [x] Engraved serif landing tagline and buttons with subdued page brightness
 - [x] Clear sign-in placeholders, soften Add memory, remove Community feed section and place My memories below Add memory
 - [x] Community-first sign-in with posting and prominent Archive access

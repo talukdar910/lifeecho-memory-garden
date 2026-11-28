@@ -51,3 +51,4 @@ use the editor.
 - Home-screen support is manifest-only with browser installation prompts and platform guidance in `InstallApp`; do not register an app-shell service worker because offline caching was not requested and can break previews.
 - Community renders Archive access and memory actions without a feed; keep My memories directly below Add memory while retaining existing backend social data for other consumers.
 - Scope landing brightness and engraving treatments through landing-specific CSS utilities so member and memorial screens retain their existing themes.
+- Memorial timelines combine RLS-filtered original life_memories with archive_memories contributions; contributions retain their author's ownership and private/public visibility, never mutate the archived account, and do not use life-memory translation/report RPCs because those target a different table.

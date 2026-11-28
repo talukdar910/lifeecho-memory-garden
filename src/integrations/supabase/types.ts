@@ -77,6 +77,59 @@ export type Database = {
         }
         Relationships: []
       }
+      archive_memories: {
+        Row: {
+          archive_entry_id: string
+          body: string | null
+          created_at: string
+          emotion: string | null
+          id: string
+          kind: string
+          media_path: string | null
+          memory_date: string | null
+          owner_id: string
+          privacy: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          archive_entry_id: string
+          body?: string | null
+          created_at?: string
+          emotion?: string | null
+          id?: string
+          kind: string
+          media_path?: string | null
+          memory_date?: string | null
+          owner_id?: string
+          privacy?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          archive_entry_id?: string
+          body?: string | null
+          created_at?: string
+          emotion?: string | null
+          id?: string
+          kind?: string
+          media_path?: string | null
+          memory_date?: string | null
+          owner_id?: string
+          privacy?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "archive_memories_archive_entry_id_fkey"
+            columns: ["archive_entry_id"]
+            isOneToOne: false
+            referencedRelation: "archive_entries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_log: {
         Row: {
           action: string

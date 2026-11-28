@@ -7,6 +7,17 @@ import { fileExtension, missingProfileFields } from "./memory-rules";
 export type Profile = Tables<"profiles">;
 export type LifeMemory = Tables<"life_memories">;
 export type ArchiveEntry = Tables<"archive_entries">;
+export type ArchiveMemory = Tables<"archive_memories">;
+
+export const archiveMemoriesQuery = (entryId: string) =>
+  queryOptions({
+    queryKey: ["archive-contributions", entryId],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("archive_memories").select("*").eq("archive_entry_id", entryId);
+      if (error) throw error;
+      return data;
+    },
+  });
 
 export const MEDIA_BUCKET = "memories";
 export const PROOF_BUCKET = "verification";

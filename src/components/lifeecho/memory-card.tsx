@@ -41,6 +41,7 @@ export function MemoryCard({
   onPrivacyChange,
   showPrivacy = false,
   reportable = false,
+  translatable = true,
 }: {
   memory: MemoryLike;
   url?: string | undefined;
@@ -49,6 +50,7 @@ export function MemoryCard({
   showPrivacy?: boolean;
   /** Lets signed-in readers flag someone else's memory for review. */
   reportable?: boolean;
+  translatable?: boolean;
 }) {
   const { user } = useAuth();
   const [translation, setTranslation] = useState<Translation | null>(null);
@@ -100,7 +102,7 @@ export function MemoryCard({
               </span>
             )}
             {showPrivacy && privacy && <PrivacyMenu value={privacy} onChange={onPrivacyChange} />}
-            {user && <TranslateButton memoryId={memory.id} translation={translation} onChange={setTranslation} />}
+             {user && translatable && <TranslateButton memoryId={memory.id} translation={translation} onChange={setTranslation} />}
           </div>
         )}
       </div>

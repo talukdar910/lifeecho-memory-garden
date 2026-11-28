@@ -25,6 +25,20 @@ export const PRIVACY_OPTIONS = ["private", "legacy", "public"] as const;
 export type Privacy = (typeof PRIVACY_OPTIONS)[number];
 /** New memories stay with their owner until they choose to share them. */
 export const DEFAULT_PRIVACY: Privacy = "private";
+/** Memorial contributions belong to their author, never to the archived account. */
+export function canManageContribution(ownerId: string, viewerId: string | null | undefined): boolean {
+  return !!viewerId && ownerId === viewerId;
+}
+
+/** Oldest remembered event first; undated memories stay at the end. */
+export function sortMemoryTimeline<T extends { id: string; memory_date: string | null; created_at: string }>(memories: readonly T[]): T[] {
+  return [...memories].sort((a, b) => {
+    if (a.memory_date && !b.memory_date) return -1;
+    if (!a.memory_date && b.memory_date) return 1;
+    return (a.memory_date ?? "").localeCompare(b.memory_date ?? "")
+      || a.created_at.localeCompare(b.created_at) || a.id.localeCompare(b.id);
+  });
+}
 export const PRIVACY_LABEL: Record<Privacy, string> = {
   private: "Only me",
   legacy: "Legacy",

@@ -2,24 +2,14 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { ArrowLeft, ArrowRight, Sprout } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { MemoryCard } from "@/components/lifeecho/memory-card";
+import { MemorialTimeline } from "@/components/lifeecho/memorial-timeline";
 import { StatusBadge } from "@/components/lifeecho/status-badge";
-import { archiveEntryQuery, ensureCompleteProfile, archiveListQuery, legacyMemoriesQuery, useMediaUrls, type ArchiveEntry } from "@/lib/archive";
+import { archiveEntryQuery, archiveMemoriesQuery, ensureCompleteProfile, archiveListQuery, legacyMemoriesQuery, useMediaUrls, type ArchiveEntry } from "@/lib/archive";
 import marble from "@/assets/memorial-marble.asset.json";
 import { countryName } from "@/lib/locales";
 import { formatProfileNumber, lifespan, parseProfileSlug, profileSlug } from "@/lib/memory-rules";
 
 export const Route = createFileRoute("/_authenticated/archive/$number")({
-  head: () => ({
-    meta: [
-      { title: "Archived profile — LifeEcho Memory Archive" },
-      { name: "description", content: "A life and legacy preserved in the LifeEcho Memory Archive." },
-      { property: "og:title", content: "Archived profile — LifeEcho Memory Archive" },
-      { property: "og:description", content: "A life and legacy preserved in the LifeEcho Memory Archive." },
-      { property: "og:type", content: "profile" },
-      { name: "twitter:card", content: "summary" },
-    ],
-  }),
   loader: async ({ context, params }) => {
     const n = parseProfileSlug(params.number);
     if (!n) throw notFound();
@@ -29,9 +19,23 @@ export const Route = createFileRoute("/_authenticated/archive/$number")({
       context.queryClient.ensureQueryData(archiveListQuery()),
     ]);
     if (!entry) throw notFound();
-    await context.queryClient.ensureQueryData(legacyMemoriesQuery(entry.person_id));
-    return { n };
+    await Promise.all([
+      context.queryClient.ensureQueryData(legacyMemoriesQuery(entry.person_id)),
+      context.queryClient.ensureQueryData(archiveMemoriesQuery(entry.id)),
+    ]);
+    return { n, name: entry.full_name };
   },
+  head: ({ loaderData }) => ({
+    meta: [
+      { title: `${loaderData?.name ?? "Memorial"} — LifeEcho Memory Archive` },
+      { name: "description", content: `Remember ${loaderData?.name ?? "a life"} through stories, photos and videos in the LifeEcho Memory Archive.` },
+      { property: "og:title", content: `${loaderData?.name ?? "Memorial"} — LifeEcho Memory Archive` },
+      { property: "og:description", content: `Remember ${loaderData?.name ?? "a life"} through stories, photos and videos in the LifeEcho Memory Archive.` },
+      { property: "og:type", content: "profile" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
+  errorComponent: ({ error }) => <div role="alert" className="memorial px-5 py-16 text-center">{error instanceof Error ? error.message : "This memorial could not be loaded."}</div>,
   notFoundComponent: () => (
     <div className="mx-auto max-w-xl px-5 py-24 text-center">
       <h1 className="text-4xl font-semibold">Profile not found</h1>
@@ -52,8 +56,7 @@ function ArchivedProfile() {
 
 function MemorialProfile({ entry: e }: { entry: ArchiveEntry }) {
   const { data: list } = useSuspenseQuery(archiveListQuery());
-  const { data: memories } = useSuspenseQuery(legacyMemoriesQuery(e.person_id));
-  const { data: urls } = useMediaUrls([e.avatar_path, ...memories.map((m) => m.media_path)]);
+  const { data: urls } = useMediaUrls([e.avatar_path]);
   const idx = list.findIndex((x) => x.profile_number === e.profile_number);
   const prev = idx > 0 ? list[idx - 1] : undefined;
   const next = idx >= 0 && idx < list.length - 1 ? list[idx + 1] : undefined;
@@ -94,20 +97,7 @@ function MemorialProfile({ entry: e }: { entry: ArchiveEntry }) {
           )}
         </section>
 
-        <div className="mt-14 text-center"><Sprout aria-hidden className="mx-auto size-5 text-memorial-gold" strokeWidth={1} />
-        <h2 className="mt-3 text-4xl font-medium">A life, in memories</h2>
-        <div className="memorial-rule mx-auto mt-4 w-24" /></div>
-        {memories.length === 0 ? (
-          <p className="mt-4 text-center text-memorial-muted italic">
-            No memories are shared with you here. Legacy memories are visible only to the contacts this member chose.
-          </p>
-        ) : (
-          <div className="mt-8 columns-1 gap-4 space-y-4 sm:columns-2">
-            {memories.map((m) => (
-              <MemoryCard key={m.id} memory={m} url={m.media_path ? urls?.[m.media_path] : undefined} showPrivacy reportable />
-            ))}
-          </div>
-        )}
+        <MemorialTimeline entry={e} />
 
         <nav className="mt-16 flex flex-wrap justify-between gap-3 border-t border-memorial-line pt-6">
           {prev ? (
